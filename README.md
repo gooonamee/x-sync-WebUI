@@ -99,12 +99,9 @@ Open your browser and visit: 👉 **[http://localhost:8765/](http://localhost:87
 
 ### Step 2: Install the Chrome Extension
 
-1. Open Google Chrome (or any Chromium browser such as Edge or Brave).
-2. Navigate to: `chrome://extensions/`
-3. Toggle on **Developer mode** in the top right corner.
-4. Click **Load unpacked** on the top left.
-5. Select the **`extension`** directory from your X sync distribution.
-6. The X sync icon will now appear in your browser toolbar.
+1. Go to the Chrome Web Store [「X sync」Extension Page](https://chromewebstore.google.com/detail/ffpdbmdjolkbfoapdcdepojhhncpopjm?utm_source=item-share-cb).
+2. Click the **「Add to Chrome」** button.
+3. Done! The X sync icon will now appear in your browser toolbar.
 
 ---
 

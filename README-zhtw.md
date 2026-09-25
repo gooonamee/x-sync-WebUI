@@ -99,12 +99,9 @@ python server\server.py
 
 ### 第二步：安裝 Chrome 瀏覽器外掛
 
-1. 打開 Google Chrome（或 Chromium 架構瀏覽器如 Edge / Brave）。
-2. 在網址列輸入並前往：`chrome://extensions/`
-3. 開啟右上角的 **「開發人員模式 (Developer mode)」**。
-4. 點選左上角的 **「載入未打包項目 (Load unpacked)」**。
-5. 選取您的 **X sync 擴充功能資料夾 (`extension`)**。
-6. 安裝完成後，Chrome 工具列將出現 X sync 專屬圖示。
+1. 前往 Chrome 線上應用程式商店 [「X sync」擴充功能頁面](https://chromewebstore.google.com/detail/ffpdbmdjolkbfoapdcdepojhhncpopjm?utm_source=item-share-cb)。
+2. 點擊 **「加到 Chrome」**（Add to Chrome）按鈕。
+3. 安裝完成！Chrome 工具列將出現 X sync 專屬圖示。
 
 ---
 
