@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">X Sync</title>
+  <desc id="desc">Blue to violet crossing synchronization arrows above the X Sync wordmark.</desc>
+  <defs>
+    <linearGradient id="xSyncGradient" x1="96" y1="74" x2="385" y2="335" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#008CFF"/>
+      <stop offset=".52" stop-color="#256DF7"/>
+      <stop offset="1" stop-color="#7337EE"/>
+    </linearGradient>
+  </defs>
+
+  <!-- White, rounded app-tile background from the approved Version C artwork. -->
+  <rect width="512" height="512" rx="60" fill="#FFFFFF"/>
+
+  <!-- Upper, right-moving sync ribbon. -->
+  <path fill="url(#xSyncGradient)" d="M100 97h89c16 0 29 6 39 18l23 23 18-23c10-12 24-18 39-18h25V69l61 51-61 52v-31h-25c-12 0-21 5-30 15l-66 62z"/>
+
+  <!-- Lower, left-moving sync ribbon. Its arrowhead deliberately interlocks with the first ribbon. -->
+  <path fill="url(#xSyncGradient)" d="M113 282l53-52v29h44c15 0 25-5 36-16l43-46 105 110h-84c-15 0-28-5-39-16l-25-25-28 28c-13 13-26 17-44 17h-8v24z"/>
+
+  <!-- Wordmark: blue X followed by dark Sync, matching the approved lockup. -->
+  <path fill="url(#xSyncGradient)" d="M105 344h26l18 24 18-24h26l-31 40 34 44h-26l-21-28-21 28h-26l34-44z"/>
+  <text x="199" y="427" fill="#141A2A" font-family="'Arial Rounded MT Bold', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="81" font-weight="700" letter-spacing="-2px">Sync</text>
+</svg>

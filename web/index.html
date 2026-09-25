@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X sync - 書籤與點讚本地管理</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/x-sync-icon-32.png">
+  <link rel="apple-touch-icon" sizes="128x128" href="assets/x-sync-icon-128.png">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo">
+          <img src="assets/logo.svg" alt="X sync Logo">
+        </div>
+        <span class="brand-title">X sync</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tab="bookmark" id="nav-bookmarks">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span data-i18n="nav_bookmarks">書籤</span>
+        </button>
+
+        <button class="nav-item" data-tab="like" id="nav-likes">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+          <span data-i18n="nav_likes">點讚</span>
+        </button>
+
+        <button class="nav-item" data-tab="history" id="nav-history">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span data-i18n="nav_history">同步記錄</span>
+        </button>
+
+        <div class="sidebar-divider"></div>
+
+        <button class="nav-item" id="nav-help">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span data-i18n="nav_help">說明</span>
+        </button>
+      </nav>
+
+      <!-- Language Selector -->
+      <div class="sidebar-lang-switch">
+        <svg class="lang-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <select id="lang-select" class="lang-selector-select" title="介面語言 / Language">
+          <option value="zh-TW" selected>繁體中文</option>
+          <option value="en">English (en)</option>
+          <option value="de">Deutsch (德文)</option>
+          <option value="fr">Français (法文)</option>
+          <option value="es">Español (西班牙文)</option>
+          <option value="zh-CN">简体中文</option>
+        </select>
+      </div>
+
+      <!-- Sponsor Author Button -->
+      <div class="sidebar-sponsor-wrapper">
+        <a href="https://nowpayments.io/donation/xsync" target="_blank" rel="noopener noreferrer" class="sidebar-sponsor-btn" id="sidebar-sponsor-btn" title="贊助作者">
+          <span class="sponsor-icon">☕</span>
+          <span data-i18n="nav_sponsor">贊助作者</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Title Bar -->
+      <header class="content-header">
+        <div class="header-left">
+          <div class="title-row">
+            <h1 id="page-title">書籤</h1>
+            <span class="count-badge" id="total-count">0</span>
+          </div>
+          <p class="subtitle" id="page-subtitle">保存在此裝置上的書籤，可隨時搜尋與篩選。</p>
+        </div>
+        <div class="header-right">
+          <button class="btn-primary" id="btn-sync-now">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span id="sync-button-text" data-i18n="btn_sync_bookmarks">同步書籤</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Search and Filter Bar -->
+      <section class="filter-section">
+        <div class="search-row">
+          <!-- Text/URL Search Input -->
+          <div class="search-input-group main-search">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="search-text" placeholder="搜尋內文或連結" data-i18n-placeholder="placeholder_search_text">
+          </div>
+
+          <!-- Author Search Input -->
+          <div class="search-input-group author-search">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="7" r="4"></circle>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            </svg>
+            <input type="text" id="search-author" placeholder="作者名或 @使用者名稱" data-i18n-placeholder="placeholder_search_author">
+          </div>
+
+          <!-- Search Button -->
+          <button class="btn-search" id="btn-do-search">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span data-i18n="btn_search">搜尋</span>
+          </button>
+        </div>
+
+        <!-- Filter Chips Row -->
+        <div class="chips-row">
+          <div class="filter-label">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="4" y1="21" x2="4" y2="14"></line>
+              <line x1="4" y1="10" x2="4" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12" y2="3"></line>
+              <line x1="20" y1="21" x2="20" y2="16"></line>
+              <line x1="20" y1="12" x2="20" y2="3"></line>
+              <line x1="1" y1="14" x2="7" y2="14"></line>
+              <line x1="9" y1="8" x2="15" y2="8"></line>
+              <line x1="17" y1="16" x2="23" y2="16"></line>
+            </svg>
+            <span data-i18n="filter_label">篩選</span>
+          </div>
+
+          <div class="dropdown-chip">
+            <select id="filter-media">
+              <option value="all" data-i18n="filter_type_all">全部類型</option>
+              <option value="text_only" data-i18n="filter_type_text">純文字</option>
+              <option value="photo" data-i18n="filter_type_photo">含圖片</option>
+              <option value="video" data-i18n="filter_type_video">含影片</option>
+            </select>
+          </div>
+
+          <div class="dropdown-chip">
+            <select id="filter-lang">
+              <option value="all" data-i18n="filter_lang_all">全部語言</option>
+              <option value="zh" data-i18n="filter_lang_zh">中文</option>
+              <option value="en" data-i18n="filter_lang_en">英文</option>
+              <option value="ja" data-i18n="filter_lang_ja">日文</option>
+            </select>
+          </div>
+
+          <div class="dropdown-chip">
+            <select id="filter-time">
+              <option value="all" data-i18n="filter_time_all">全部時間</option>
+              <option value="7d" data-i18n="filter_time_7d">最近 7 天</option>
+              <option value="30d" data-i18n="filter_time_30d">最近 30 天</option>
+              <option value="1y" data-i18n="filter_time_1y">最近 1 年</option>
+            </select>
+          </div>
+
+          <div class="dropdown-chip">
+            <select id="filter-tag">
+              <option value="all" data-i18n="filter_tag_all">全部標籤</option>
+              <option value="none" data-i18n="filter_tag_none">無標籤</option>
+            </select>
+          </div>
+
+          <div class="dropdown-chip">
+            <select id="filter-sort" title="排序方式" data-i18n-title="sort_tooltip">
+              <option value="time_desc" data-i18n="sort_time_desc">貼文時間：新到舊</option>
+              <option value="time_asc" data-i18n="sort_time_asc">貼文時間：舊到新</option>
+              <option value="tags_desc" data-i18n="sort_tags_desc">標籤數：最多到最低</option>
+              <option value="tags_asc" data-i18n="sort_tags_asc">標籤數：最低到最高</option>
+            </select>
+          </div>
+
+          <button class="btn-chip" id="btn-manage-all-tags" title="標籤維護" data-i18n-title="btn_manage_tags_title">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+              <line x1="7" y1="7" x2="7.01" y2="7"></line>
+            </svg>
+            <span data-i18n="btn_manage_tags">標籤維護</span>
+          </button>
+
+          <button class="btn-chip" id="btn-batch-toggle">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+            <span data-i18n="btn_batch_toggle">批量管理</span>
+          </button>
+
+          <div class="view-switchers">
+            <button class="view-btn active" id="view-grid" title="網格檢視" data-i18n-title="view_grid_title">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+            </button>
+            <button class="view-btn" id="view-list" title="列表檢視" data-i18n-title="view_list_title">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Batch Action Bar (Hidden by default) -->
+        <div class="batch-action-bar" id="batch-bar" style="display: none;">
+          <div class="batch-left">
+            <label class="checkbox-label">
+              <input type="checkbox" id="select-all-check">
+              <span><span data-i18n="batch_select_all">全選</span> (<span id="selected-count">0</span>)</span>
+            </label>
+          </div>
+          <div class="batch-right">
+            <button class="btn-batch-action" id="btn-batch-tag">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+              </svg>
+              <span data-i18n="batch_tag">貼標籤</span>
+            </button>
+            <button class="btn-batch-action primary-batch" id="btn-export-markdown">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span data-i18n="batch_export_md">匯出 Markdown (.md)</span>
+            </button>
+            <button class="btn-batch-action danger-batch" id="btn-batch-delete">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              <span data-i18n="batch_delete">刪除</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cards Grid Container -->
+      <section class="cards-grid" id="tweets-container">
+        <!-- Rendered dynamically by app.js -->
+      </section>
+
+      <!-- Empty State (Hidden) -->
+      <div class="empty-state" id="empty-state" style="display: none;">
+        <div class="empty-icon">📭</div>
+        <h3 data-i18n="empty_title">暫無同步資料</h3>
+        <p data-i18n="empty_desc">透過 Chrome 外掛訪問 x.com 點擊同步，即可將書籤或點讚儲存至此。</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Markdown Export Modal -->
+  <div class="modal-overlay" id="export-modal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <h3 data-i18n="modal_export_title">匯出 Markdown 格式</h3>
+          <span class="count-badge" id="export-items-count" style="font-size: 14px; color: #1D9BF0;">0 篇</span>
+        </div>
+        <button class="modal-close" id="btn-close-export">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc" data-i18n="modal_export_desc">將選取的推文匯出為標準的 Markdown 文件（含 YAML Frontmatter、統計數據與原推引用）。</p>
+        
+        <div class="form-group">
+          <label class="form-label" data-i18n="export_format_label">匯出格式選項：</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="export-mode" value="combined" checked>
+              <span data-i18n="export_mode_combined"><strong>單一彙總文件 (.md)</strong>：所有推文合併為一個結構清晰的文件</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="export-mode" value="zip">
+              <span data-i18n="export_mode_zip"><strong>獨立文件壓縮包 (.zip)</strong>：每篇推文各生成一個 .md 文件（適配 Obsidian/Logseq）</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="markdown-preview-container" id="md-preview-container">
+          <div class="preview-header" data-i18n="preview_header">預覽生成內容：</div>
+          <pre class="preview-code" id="md-preview-code">正在生成預覽...</pre>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="btn-cancel-export" data-i18n="btn_cancel">取消</button>
+        <button class="btn-primary" id="btn-confirm-export" data-i18n="btn_download_now">立即下載</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tag Modal -->
+  <div class="modal-overlay" id="tag-modal" style="display: none;">
+    <div class="modal-card small-modal">
+      <div class="modal-header">
+        <h3 id="tag-modal-title" data-i18n="tag_modal_title">管理標籤</h3>
+        <button class="modal-close" id="btn-close-tag">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" data-i18n="tag_input_label">輸入標籤名稱：</label>
+          <input type="text" class="text-input" id="input-tag-name" placeholder="例如: AI, 實用工具, 閱讀" data-i18n-placeholder="tag_input_placeholder">
+        </div>
+        <div class="popular-tags-area">
+          <span class="sub-label" data-i18n="popular_tags_label">常用標籤：</span>
+          <div class="tag-chips-list" id="quick-tags-list"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="btn-cancel-tag" data-i18n="btn_cancel">取消</button>
+        <button class="btn-primary" id="btn-save-tag" data-i18n="btn_save_tag">確定新增</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manage Tags Modal (Rename & Delete Tags) -->
+  <div class="modal-overlay" id="manage-tags-modal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-with-icon">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1D9BF0" stroke-width="2">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+          </svg>
+          <h3 data-i18n="modal_manage_tags_title">標籤維護</h3>
+        </div>
+        <button class="modal-close" id="btn-close-manage-tags">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="tags-modal-notice">
+          <svg class="notice-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span data-i18n="tags_modal_notice">說明：更名或刪除標籤僅會更新標籤名稱或移除推文上的標籤，<strong>不會影響任何收藏貼文的內容</strong>。</span>
+        </div>
+
+        <div class="manage-tags-create-row">
+          <input type="text" class="text-input" id="input-new-tag-modal" placeholder="輸入新標籤名稱 (按 Enter 新增)..." data-i18n-placeholder="tag_input_placeholder">
+          <button class="btn-primary" id="btn-create-tag-modal" data-i18n="tag_context_btn_add">新增</button>
+        </div>
+
+        <div class="manage-tags-list-header">
+          <span data-i18n="tags_list_header">現有標籤清單</span>
+          <span class="manage-tags-total-count" id="manage-tags-total-count">0 個標籤</span>
+        </div>
+
+        <div class="manage-tags-scroll-container" id="manage-tags-list">
+          <!-- Dynamically populated rows -->
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary" id="btn-done-manage-tags" data-i18n="btn_done">完成</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right-Click Context Tag Popup -->
+  <div class="context-tag-popup" id="context-tag-popup" style="display: none;">
+    <div class="context-tag-header">
+      <div class="context-tag-title-wrap">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+          <line x1="7" y1="7" x2="7.01" y2="7"></line>
+        </svg>
+        <span class="context-tag-title" id="context-tag-title" data-i18n="tag_context_title">為推文新增標籤</span>
+      </div>
+      <button class="context-tag-close" id="btn-close-context-tag" title="關閉">&times;</button>
+    </div>
+    
+    <div class="context-tag-body">
+      <!-- Existing tags on this tweet -->
+      <div class="context-existing-section" id="context-existing-section">
+        <div class="context-sub-label" data-i18n="tag_context_current">現有標籤：</div>
+        <div class="context-existing-tags" id="context-existing-tags"></div>
+      </div>
+
+      <!-- Tag input & Add button -->
+      <div class="context-input-row">
+        <input type="text" class="context-tag-input" id="context-tag-input" placeholder="輸入標籤名稱 (按 Enter 新增)..." data-i18n-placeholder="tag_context_input_placeholder">
+        <button class="btn-context-tag-add" id="btn-context-tag-add" data-i18n="tag_context_btn_add">新增</button>
+      </div>
+
+      <!-- Quick / Popular tags -->
+      <div class="context-quick-section" id="context-quick-section">
+        <div class="context-sub-label" data-i18n="tag_context_quick">常用標籤 (點擊直接新增)：</div>
+        <div class="context-quick-tags" id="context-quick-tags"></div>
+      </div>
+
+      <!-- Delete Tweet Action Section -->
+      <div class="context-danger-section">
+        <button type="button" class="btn-context-delete" id="btn-context-delete">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span data-i18n="btn_delete_tweet">刪除此則推文</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sync Guide / Settings Modal -->
+  <div class="modal-overlay" id="sync-guide-modal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 data-i18n="guide_title">同步書籤與點讚指南</h3>
+        <button class="modal-close" id="btn-close-guide">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="guide-steps">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-text">
+              <strong data-i18n="step1_title">安裝 Chrome 擴充功能</strong>
+              <p data-i18n="step1_desc">在 Chrome 打開 <code>chrome://extensions/</code>，開啟「開發人員模式」，點選「載入未打包項目」，選擇本專案的 <code>extension</code> 目錄。</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-text">
+              <strong data-i18n="step2_title">前往 x.com 點擊同步</strong>
+              <p data-i18n="step2_desc">在已登入的 x.com 書籤或點讚頁面點擊 X sync 圖示，選擇「一次同步 50 筆」或「全量同步」，右下角將顯示即時進度浮窗。</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-text">
+              <strong data-i18n="step3_title">本地即時落庫</strong>
+              <p data-i18n="step3_desc">推文與多媒體檔案將自動過濾重複，即時寫入本機 SQLite 資料庫，切換回本面板立即呈現！</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" id="btn-guide-ok" data-i18n="btn_guide_ok">了解</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="global-toast"></div>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

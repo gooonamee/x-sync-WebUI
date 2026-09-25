@@ -1,0 +1,69 @@
+# ==========================================
+# X sync Backend - Git Ignore Rules
+# ==========================================
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Python Bytecode and Build Artifacts
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE and Text Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# Runtime Logs
+*.log
+batch_run.log
+
+# SQLite Temporary Files (WAL, Lock, Rollback journals)
+*.db-wal
+*.db-shm
+*.db-journal
+
+# Downloaded Media Files (Keep folder structure via .gitkeep)
+server/data/media/*
+!server/data/media/.gitkeep
+
+# Optional: If you want git to ignore your personal synced database changes,
+# uncomment the line below:
+# server/data/x_sync.db
