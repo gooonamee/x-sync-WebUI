@@ -7,6 +7,7 @@ const I18N_LOCALES = {
     nav_likes: '點讚',
     nav_history: '同步記錄',
     nav_help: '說明',
+    nav_website: '官網',
     nav_sponsor: '贊助作者',
     nav_lang: '介面語言',
 
@@ -101,8 +102,8 @@ const I18N_LOCALES = {
     delete_single_confirm: '確定要從本地資料庫刪除此則推文嗎？此操作無法復原。',
 
     guide_title: '同步書籤與點讚指南',
-    step1_title: '安裝 Chrome 擴充功能',
-    step1_desc: '在 Chrome 開啟 chrome://extensions/，開啟「開發人員模式」，點選「載入未打包項目」，選擇本專案的 extension 目錄。',
+    step1_title: '去 Chrome WebStore 安裝下載',
+    step1_desc: '前往 <a href="https://chromewebstore.google.com/detail/ffpdbmdjolkbfoapdcdepojhhncpopjm" target="_blank" rel="noopener noreferrer" style="color: #1D9BF0; text-decoration: underline;">Chrome WebStore 頁面</a> 安裝下載「X sync」擴充功能，點選「加到 Chrome」即可完成安裝。',
     step2_title: '前往 x.com 點擊同步',
     step2_desc: '在已登入的 x.com 書籤或點讚頁面點擊 X sync 圖示，選擇「一次同步 50 筆」或「全量同步」，右下角將顯示即時進度浮窗。',
     step3_title: '本地即時落庫',
@@ -137,6 +138,7 @@ const I18N_LOCALES = {
     nav_likes: 'Likes',
     nav_history: 'Sync History',
     nav_help: 'Help',
+    nav_website: 'Official Website',
     nav_sponsor: 'Sponsor Author',
     nav_lang: 'Language',
 
@@ -231,8 +233,8 @@ const I18N_LOCALES = {
     delete_single_confirm: 'Are you sure you want to delete this tweet from the local database? This cannot be undone.',
 
     guide_title: 'Sync Bookmarks & Likes Guide',
-    step1_title: 'Install Chrome Extension',
-    step1_desc: 'Open chrome://extensions/ in Chrome, enable "Developer mode", click "Load unpacked", and select the project extension directory.',
+    step1_title: 'Install from Chrome Web Store',
+    step1_desc: 'Go to the <a href="https://chromewebstore.google.com/detail/ffpdbmdjolkbfoapdcdepojhhncpopjm" target="_blank" rel="noopener noreferrer" style="color: #1D9BF0; text-decoration: underline;">Chrome Web Store</a> to install the "X sync" extension by clicking "Add to Chrome".',
     step2_title: 'Visit x.com and Sync',
     step2_desc: 'Open x.com bookmarks or likes, click the X sync icon, choose "Sync 50" or "Full Sync", and watch real-time progress in the bottom-right HUD.',
     step3_title: 'Instant Local Storage',
@@ -267,6 +269,7 @@ const I18N_LOCALES = {
     nav_likes: 'Gefällt mir',
     nav_history: 'Sync-Verlauf',
     nav_help: 'Hilfe',
+    nav_website: 'Offizielle Website',
     nav_sponsor: 'Autor unterstützen',
     nav_lang: 'Sprache',
 
@@ -397,6 +400,7 @@ const I18N_LOCALES = {
     nav_likes: "J'aime",
     nav_history: 'Historique de sync',
     nav_help: 'Aide',
+    nav_website: 'Site officiel',
     nav_sponsor: 'Soutenir l\'auteur',
     nav_lang: 'Langue',
 
@@ -527,6 +531,7 @@ const I18N_LOCALES = {
     nav_likes: 'Me gusta',
     nav_history: 'Historial de sync',
     nav_help: 'Ayuda',
+    nav_website: 'Sitio oficial',
     nav_sponsor: 'Apoyar al autor',
     nav_lang: 'Idioma',
 
@@ -657,6 +662,7 @@ const I18N_LOCALES = {
     nav_likes: '点赞',
     nav_history: '同步记录',
     nav_help: '帮助',
+    nav_website: '官网',
     nav_sponsor: '赞助作者',
     nav_lang: '界面语言',
 
@@ -809,7 +815,8 @@ function setLanguage(lang) {
 function applyTranslations() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    el.textContent = t(key);
+    const val = t(key);
+    if (val && val.includes('<') && val.includes('>')) { el.innerHTML = val; } else { el.textContent = val; }
   });
 
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
