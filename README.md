@@ -1,32 +1,33 @@
-# X sync Backend Management System
+# X-sync WebUI
 
-> 🚀 **Local Web Management Dashboard & Microservice for X (Twitter) Bookmarks & Likes Sync**  
-> Privacy-first, 100% offline, zero external dependencies, built purely with Python 3 standard library.
+> 🚀 **X-sync WebUI is for Visually View and Organize your X bookmarks and Likes data stored with X-Sync Chrome Extension**
 
----
+View your data locally with X-sync WebUI is easy. Just a few steps:
+1. Download the files from this repo to the folder you want.
+2. Click or run `./start.sh` (Mac/Linux) or `start.bat` (Windows).
+3. Open your browser and check out the [http://localhost:8765](http://localhost:8765) web page.
 
-## 📖 Overview
+> ℹ️ **Notice**: In order to run X-sync WebUI, it requires the target machine to already have Python 3 installed.
 
-The **X sync Backend Management System** is the local management interface and storage daemon designed to pair with the **X sync Browser Extension**. When you sync your X (Twitter) bookmarks or likes, the extension securely sends the extracted tweet payloads to this local server, persisting them into a local SQLite database on your machine.
-
-It features a high-fidelity, pixel-perfect Twitter-themed Web UI supporting full-text search, author filtering, media inspection, tag management, right-click context shortcuts, and one-click export to standard Markdown files (formatted for **Obsidian**, **Logseq**, and **Notion**).
+- 🌐 **Official Website**: [https://www.gooo.name/tool/Browser/Xsync.html](https://www.gooo.name/tool/Browser/Xsync.html)
+- 📦 **X-sync Extension WebUI Repo**: [https://github.com/gooonamee/x-sync-WebUI](https://github.com/gooonamee/x-sync-WebUI)
 
 ---
 
 ## ✨ Key Features
 
-1. **🔒 100% Local & Privacy-Focused**:
-   - All tweets, metadata, tags, and media assets are stored exclusively on your local machine (`server/data/`). No data is ever sent to third-party clouds or remote analytics servers.
+1. **🔒 100% Local & Privacy-First**:
+   - All tweets, metadata, tags, and media are stored exclusively on your local machine (`server/data/`). No personal data is sent to external clouds or servers.
 2. **⚡ Zero External Dependencies**:
-   - Powered purely by the Python 3 standard library (`http.server`, `sqlite3`, `socketserver`, `urllib`). No `pip install` required, and no Node.js runtime needed.
-3. **🖥️ Twitter-Native User Experience**:
-   - 1:1 reproduction of the modern X/Twitter web interface design.
+   - Powered purely by the Python 3 standard library (`http.server`, `sqlite3`, `socketserver`, `urllib`). No `pip install` or Node.js required.
+3. **🖥️ Twitter-Native UI Experience**:
+   - 1:1 pixel-perfect reproduction of modern X/Twitter design with dark/light theme support.
    - Dual view modes: Grid layout and List layout.
    - Multi-photo mosaic preview and dedicated video tags.
-4. **🔍 Robust Search & Multi-Dimensional Filtering**:
+4. **🔍 Search & Multi-Dimensional Filtering**:
    - Dual search bars: Full-text keyword/link search + Author handle (`@handle`) filter.
    - Granular dropdown filters: Media types (Text-only / Images / Video), language, time range (7 days / 30 days / 1 year), and tags.
-5. **🏷️ Intuitive Tag Management & Context Actions**:
+5. **🏷️ Tag Management & Context Actions**:
    - Right-click context popup on any tweet card to quickly attach tags or delete the tweet.
    - Comprehensive tag maintenance modal for batch renaming and organizing tags.
 6. **📦 Knowledge-Base Ready Markdown Export**:
@@ -37,10 +38,28 @@ It features a high-fidelity, pixel-perfect Twitter-themed Web UI supporting full
 
 ---
 
+## 🧩 How to Sync with Chrome Extension
+
+### Step 1: Install the Chrome Extension
+1. Go to the Chrome Web Store [「X sync」Extension Page](https://chromewebstore.google.com/detail/ffpdbmdjolkbfoapdcdepojhhncpopjm?utm_source=item-share-cb).
+2. Click the **「Add to Chrome」** button.
+3. Done! The X sync icon will appear in your browser toolbar.
+
+### Step 2: Start Syncing Your Bookmarks & Likes
+1. In Chrome, log in to [x.com](https://x.com/).
+2. Navigate to your [Bookmarks](https://x.com/i/bookmarks) or your profile's [Likes](https://x.com) tab.
+3. Click the **X sync extension icon** in your browser toolbar.
+4. Select your preferred sync batch (e.g., "Sync 50 Tweets", "Deep Sync 100", or "Full Sync").
+5. Click **Sync Bookmarks** or **Sync Likes**.
+6. A real-time HUD appears at the bottom-right corner of the page, automatically scrolling and de-duplicating tweets as it persists them into your local database.
+7. Switch back to your WebUI at [http://localhost:8765](http://localhost:8765) to search, categorize, and export your collection!
+
+---
+
 ## 📁 Repository Structure
 
 ```text
-x-sync-backend/
+x-sync-WebUI/
 ├── server/                     # Local backend service & database
 │   ├── server.py               # HTTP API server (default port 8765)
 │   ├── database.py             # SQLite connection & schema initialization
@@ -63,87 +82,10 @@ x-sync-backend/
 
 ---
 
-## 🚀 Getting Started
-
-### Prerequisites
-- **Operating System**: macOS / Windows / Linux
-- **Python Runtime**: Python 3.9+ installed (`python3 --version` or `python --version`)
-
----
-
-### Step 1: Launch the Local Server
-
-#### 🔹 macOS / Linux
-Open Terminal, navigate to the folder, and run:
-```bash
-chmod +x start.sh
-./start.sh
-```
-*(The server starts listening on `http://localhost:8765/` and automatically opens the dashboard in your default browser).*
-
-#### 🔹 Windows
-Double-click **`start.bat`** in File Explorer, or open Command Prompt (CMD) / PowerShell:
-```cmd
-start.bat
-```
-
-#### 🔹 Manual Launch (Cross-Platform)
-```bash
-python3 server/server.py
-# Or on Windows:
-python server\server.py
-```
-Open your browser and visit: 👉 **[http://localhost:8765/](http://localhost:8765/)**
-
----
-
-### Step 2: Install the Chrome Extension
-
-1. Go to the Chrome Web Store [「X sync」Extension Page](https://chromewebstore.google.com/detail/ffpdbmdjolkbfoapdcdepojhhncpopjm?utm_source=item-share-cb).
-2. Click the **「Add to Chrome」** button.
-3. Done! The X sync icon will now appear in your browser toolbar.
-
----
-
-### Step 3: Sync Your Bookmarks & Likes
-
-1. In Chrome, log in to [x.com](https://x.com/).
-2. Navigate to your **[Bookmarks](https://x.com/i/bookmarks)** or your profile's **Likes** tab.
-3. Click the **X sync extension icon** in the toolbar.
-4. Select your preferred sync batch (e.g., "Sync 50 Tweets", "Deep Sync 100", or "Full Sync").
-5. Click **Sync Bookmarks** or **Sync Likes**.
-6. A real-time HUD appears at the bottom-right corner of the page, automatically scrolling and de-duplicating tweets as it persists them into your local database.
-7. Switch back to your dashboard at `http://localhost:8765/` to search, categorize, and export your collection!
-
----
-
 ## 💡 Maintenance & Backup
 
-### 1. Backing Up Your Data
-- All your synced tweets, tags, and history logs reside inside **`server/data/x_sync.db`**.
-- To create a full backup, simply copy `x_sync.db` and the `server/data/media/` folder to your backup location.
-
-### 2. Port Conflict Resolution
-- The default port is `8765`. If port 8765 is occupied, open `server/server.py` and adjust `PORT = 8765` to another port (e.g., `8766`), then update the corresponding endpoint in the extension settings.
-
-### 3. Publishing to GitHub
-This archive includes a ready-to-use `.gitignore`. You can directly initialize and push it to your GitHub account:
-```bash
-# 1. Enter the extracted folder
-cd x-sync-backend
-
-# 2. Initialize Git
-git init
-
-# 3. Stage and commit files
-git add .
-git commit -m "Initial commit: X sync backend management system"
-
-# 4. Link to your GitHub repository and push
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
-git push -u origin main
-```
+- **Backing Up Data**: All your synced tweets, tags, and history logs reside inside `server/data/x_sync.db`. Copy `x_sync.db` and `server/data/media/` to your backup location for a 100% complete offline backup.
+- **Port Conflict Resolution**: The default port is `8765`. If port 8765 is occupied, you can run `PORT=8766 python3 server/server.py` or edit `PORT = int(os.environ.get('PORT', 8765))` in `server/server.py`.
 
 ---
 
