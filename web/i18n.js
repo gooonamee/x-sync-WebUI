@@ -106,7 +106,7 @@ const I18N_LOCALES = {
     step1_desc: '前往 <a href="https://chromewebstore.google.com/detail/ffpdbmdjolkbfoapdcdepojhhncpopjm" target="_blank" rel="noopener noreferrer" style="color: #1D9BF0; text-decoration: underline;">Chrome WebStore 頁面</a> 安裝下載「X sync」擴充功能，點選「加到 Chrome」即可完成安裝。',
     step2_title: '前往 x.com 點擊同步',
     step2_desc: '在已登入的 x.com 書籤或點讚頁面點擊 X sync 圖示，選擇「一次同步 50 筆」或「全量同步」，右下角將顯示即時進度浮窗。',
-    step3_title: '本地即時落庫',
+    step3_title: '檢視本地同步資料',
     step3_desc: '推文與多媒體檔案將自動過濾重複，即時寫入本機 SQLite 資料庫，切換回本面板立即呈現！',
     btn_guide_ok: '了解',
 
@@ -761,7 +761,7 @@ const I18N_LOCALES = {
     step1_desc: '前往 <a href="https://chromewebstore.google.com/detail/ffpdbmdjolkbfoapdcdepojhhncpopjm" target="_blank" rel="noopener noreferrer" style="color: #1D9BF0; text-decoration: underline;">Chrome WebStore 页面</a> 安装下载「X sync」扩展程序，点击「添加至 Chrome」即可完成安装。',
     step2_title: '访问 x.com 并开始同步',
     step2_desc: '在已登录的 x.com 页面点击右上角 X sync 插件图标，选择「一次同步 50 笔」或「全量同步」，右下角将显示实时进度浮窗。',
-    step3_title: '本地实时落库',
+    step3_title: '查看本地同步数据',
     step3_desc: '推文与多媒体文件将自动过滤重复，实时写入本地 SQLite 数据库，切换回本面板即可刷新呈现！',
     btn_guide_ok: '知道了',
 
