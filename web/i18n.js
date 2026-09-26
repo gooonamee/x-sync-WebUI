@@ -138,7 +138,7 @@ const I18N_LOCALES = {
     nav_likes: 'Likes',
     nav_history: 'Sync History',
     nav_help: 'Help',
-    nav_website: 'Official Website',
+    nav_website: 'official website',
     nav_sponsor: 'Sponsor Author',
     nav_lang: 'Language',
 
@@ -269,7 +269,7 @@ const I18N_LOCALES = {
     nav_likes: 'Gefällt mir',
     nav_history: 'Sync-Verlauf',
     nav_help: 'Hilfe',
-    nav_website: 'Offizielle Website',
+    nav_website: 'official website',
     nav_sponsor: 'Autor unterstützen',
     nav_lang: 'Sprache',
 
@@ -365,7 +365,7 @@ const I18N_LOCALES = {
 
     guide_title: 'Anleitung zur Synchronisierung',
     step1_title: 'Chrome-Erweiterung installieren',
-    step1_desc: 'Öffnen Sie chrome://extensions/, aktivieren Sie den Entwicklermodus, klicken Sie auf "Entpackte Erweiterung laden" und wählen Sie den Ordner extension.',
+    step1_desc: 'Besuchen Sie den <a href="https://chromewebstore.google.com/detail/ffpdbmdjolkbfoapdcdepojhhncpopjm" target="_blank" rel="noopener noreferrer" style="color: #1D9BF0; text-decoration: underline;">Chrome Web Store</a>, um die "X sync"-Erweiterung zu installieren.',
     step2_title: 'x.com besuchen & synchronisieren',
     step2_desc: 'Klicken Sie auf das X sync-Symbol auf x.com und wählen Sie "50 synchronisieren" oder "Vollständig synchronisieren".',
     step3_title: 'Sofortige lokale Speicherung',
@@ -400,7 +400,7 @@ const I18N_LOCALES = {
     nav_likes: "J'aime",
     nav_history: 'Historique de sync',
     nav_help: 'Aide',
-    nav_website: 'Site officiel',
+    nav_website: 'official website',
     nav_sponsor: 'Soutenir l\'auteur',
     nav_lang: 'Langue',
 
@@ -496,7 +496,7 @@ const I18N_LOCALES = {
 
     guide_title: 'Guide de synchronisation',
     step1_title: "Installer l'extension Chrome",
-    step1_desc: 'Ouvrez chrome://extensions/, activez le "Mode développeur", cliquez sur "Charger l\'extension non empaquetée" et sélectionnez le dossier extension.',
+    step1_desc: 'Rendez-vous sur le <a href="https://chromewebstore.google.com/detail/ffpdbmdjolkbfoapdcdepojhhncpopjm" target="_blank" rel="noopener noreferrer" style="color: #1D9BF0; text-decoration: underline;">Chrome Web Store</a> pour installer l\'extension "X sync".',
     step2_title: 'Ouvrir x.com et synchroniser',
     step2_desc: 'Sur vos signets ou j\'aime x.com, cliquez sur l\'icône X sync et lancez la synchronisation (50 éléments ou intégrale).',
     step3_title: 'Stockage local instantané',
@@ -531,7 +531,7 @@ const I18N_LOCALES = {
     nav_likes: 'Me gusta',
     nav_history: 'Historial de sync',
     nav_help: 'Ayuda',
-    nav_website: 'Sitio oficial',
+    nav_website: 'official website',
     nav_sponsor: 'Apoyar al autor',
     nav_lang: 'Idioma',
 
@@ -627,7 +627,7 @@ const I18N_LOCALES = {
 
     guide_title: 'Guía de sincronización',
     step1_title: 'Instalar extensión de Chrome',
-    step1_desc: 'Abre chrome://extensions/, activa el "Modo de desarrollador", haz clic en "Cargar descomprimida" y selecciona la carpeta extension.',
+    step1_desc: 'Visita <a href="https://chromewebstore.google.com/detail/ffpdbmdjolkbfoapdcdepojhhncpopjm" target="_blank" rel="noopener noreferrer" style="color: #1D9BF0; text-decoration: underline;">Chrome Web Store</a> para instalar la extensión "X sync".',
     step2_title: 'Abre x.com y sincroniza',
     step2_desc: 'En tu página de marcadores de x.com, pulsa en el icono de X sync y elige sincronizar 50 o todos los elementos.',
     step3_title: 'Almacenamiento local inmediato',
@@ -757,8 +757,8 @@ const I18N_LOCALES = {
     delete_single_confirm: '确定要从本地数据库删除此条推文吗？此操作无法撤销。',
 
     guide_title: '同步书签与点赞指南',
-    step1_title: '安装 Chrome 插件',
-    step1_desc: '在 Chrome 打开 chrome://extensions/，开启「开发者模式」，点击「加载已解压的扩展程序」，选择本项目的 extension 目录。',
+    step1_title: '去 Chrome WebStore 安装下载',
+    step1_desc: '前往 <a href="https://chromewebstore.google.com/detail/ffpdbmdjolkbfoapdcdepojhhncpopjm" target="_blank" rel="noopener noreferrer" style="color: #1D9BF0; text-decoration: underline;">Chrome WebStore 页面</a> 安装下载「X sync」扩展程序，点击「添加至 Chrome」即可完成安装。',
     step2_title: '访问 x.com 并开始同步',
     step2_desc: '在已登录的 x.com 页面点击右上角 X sync 插件图标，选择「一次同步 50 笔」或「全量同步」，右下角将显示实时进度浮窗。',
     step3_title: '本地实时落库',
