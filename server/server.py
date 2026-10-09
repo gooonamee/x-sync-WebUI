@@ -73,29 +73,7 @@ class XSyncHandler(http.server.SimpleHTTPRequestHandler):
                     self.wfile.write(f.read())
                 return
             else:
-                        elif path == '/api/discord/webhook':
-            payload = self.parse_post_json()
-            webhook_url = payload.get('webhook_url', '')
-            embed_payload = payload.get('payload', {})
-
-            if not webhook_url or not webhook_url.startswith(('https://discord.com/api/webhooks/', 'https://discordapp.com/api/webhooks/')):
-                self.send_json({"status": "error", "message": "Invalid Discord Webhook URL"}, status=400)
-                return
-
-            req_data = json.dumps(embed_payload).encode('utf-8')
-            req = urllib.request.Request(
-                webhook_url,
-                data=req_data,
-                headers={'Content-Type': 'application/json', 'User-Agent': 'X-Sync/1.0'}
-            )
-            try:
-                with urllib.request.urlopen(req, timeout=10) as resp:
-                    self.send_json({"status": "success", "code": resp.status})
-            except Exception as e:
-                self.send_json({"status": "error", "message": str(e)}, status=500)
-            return
-
-        self.send_response(404)
+                self.send_response(404)
                 self.end_headers()
                 return
 
@@ -523,6 +501,28 @@ class XSyncHandler(http.server.SimpleHTTPRequestHandler):
                     "markdown": combined_md
                 })
                 return
+
+        elif path == '/api/discord/webhook':
+            payload = self.parse_post_json()
+            webhook_url = payload.get('webhook_url', '')
+            embed_payload = payload.get('payload', {})
+
+            if not webhook_url or not webhook_url.startswith(('https://discord.com/api/webhooks/', 'https://discordapp.com/api/webhooks/')):
+                self.send_json({"status": "error", "message": "Invalid Discord Webhook URL"}, status=400)
+                return
+
+            req_data = json.dumps(embed_payload).encode('utf-8')
+            req = urllib.request.Request(
+                webhook_url,
+                data=req_data,
+                headers={'Content-Type': 'application/json', 'User-Agent': 'X-Sync/1.0'}
+            )
+            try:
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    self.send_json({"status": "success", "code": resp.status})
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, status=500)
+            return
 
         self.send_response(404)
         self.end_headers()
