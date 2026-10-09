@@ -1436,11 +1436,11 @@ body {
 }
 
 
-/* Floating Share Popup (Vertical Menu) */
+/* Floating Share Popup (Clean 4x2 Card Grid) */
 .share-popup {
   position: fixed;
   z-index: 1060;
-  width: 260px;
+  width: 326px;
   background: #FFFFFF;
   border-radius: 16px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16), 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -1450,7 +1450,7 @@ body {
 }
 
 .share-popup-header {
-  padding: 10px 14px;
+  padding: 11px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1484,96 +1484,66 @@ body {
 }
 
 .share-popup-body {
-  padding: 8px;
+  padding: 10px;
 }
 
-/* Vertical Share List */
-.share-list {
+/* 4x2 Platform Card Grid */
+.share-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.share-action-btn {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-}
-
-.share-list-item {
-  display: flex;
   align-items: center;
-  gap: 12px;
-  width: 100%;
-  height: 36px;
-  padding: 0 10px;
-  border: none;
-  background: transparent;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #1E293B;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 2px;
+  min-height: 58px;
+  border: 1px solid #F1F5F9;
+  border-radius: 10px;
+  background: #FFFFFF;
   cursor: pointer;
-  text-align: left;
+  font-size: 11px;
+  font-weight: 500;
+  color: #334155;
   transition: all 0.15s ease;
 }
 
-.share-item-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  flex-shrink: 0;
+.share-action-btn:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+  transform: translateY(-1px);
 }
 
-.share-item-label {
-  flex-grow: 1;
-  font-size: 13px;
-}
-
-.share-list-item:hover {
-  background: #F1F5F9;
-  transform: translateX(2px);
-}
-
-.item-x:hover { color: #000000; background: #F4F4F5; }
-.item-x:hover .share-item-icon { color: #000000; }
-
-.item-discord:hover { color: #5865F2; background: #F0F2FF; }
-.item-discord:hover .share-item-icon { color: #5865F2; }
-
-.item-line:hover { color: #06C755; background: #F0FDF4; }
-.item-line:hover .share-item-icon { color: #06C755; }
-
-.item-threads:hover { color: #000000; background: #F4F4F5; }
-.item-threads:hover .share-item-icon { color: #000000; }
-
-.item-whatsapp:hover { color: #25D366; background: #F0FDF4; }
-.item-whatsapp:hover .share-item-icon { color: #25D366; }
-
-.item-telegram:hover { color: #229ED9; background: #F0F9FF; }
-.item-telegram:hover .share-item-icon { color: #229ED9; }
-
-.item-facebook:hover { color: #1877F2; background: #EFF6FF; }
-.item-facebook:hover .share-item-icon { color: #1877F2; }
-
-.item-native:hover { color: #1D9BF0; background: #EBF5FE; }
-.item-native:hover .share-item-icon { color: #1D9BF0; }
+.btn-share-x:hover { color: #000000; border-color: #000000; background: #F4F4F5; }
+.btn-share-discord:hover { color: #5865F2; border-color: #5865F2; background: #F0F2FF; }
+.btn-share-line:hover { color: #06C755; border-color: #06C755; background: #F0FDF4; }
+.btn-share-threads:hover { color: #000000; border-color: #000000; background: #F4F4F5; }
+.btn-share-whatsapp:hover { color: #25D366; border-color: #25D366; background: #F0FDF4; }
+.btn-share-telegram:hover { color: #229ED9; border-color: #229ED9; background: #F0F9FF; }
+.btn-share-facebook:hover { color: #1877F2; border-color: #1877F2; background: #EFF6FF; }
+.btn-share-native:hover { color: #1D9BF0; border-color: #1D9BF0; background: #EBF5FE; }
 
 .share-divider {
   height: 1px;
   background: #F1F5F9;
-  margin: 6px 0;
+  margin: 8px 0;
 }
 
 .share-copy-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .share-copy-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 10px;
-  height: 34px;
+  gap: 10px;
+  padding: 7px 10px;
   border-radius: 8px;
   border: none;
   background: transparent;
@@ -1582,14 +1552,13 @@ body {
   font-weight: 500;
   color: #475569;
   text-align: left;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
   width: 100%;
 }
 
 .share-copy-item:hover {
   background: #F1F5F9;
   color: #0F1419;
-  transform: translateX(2px);
 }
 
 /* Context Menu Share Section */
