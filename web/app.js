@@ -540,6 +540,18 @@ async function loadStats() {
 }
 
 async function loadTags() {
+  if (filterTag) {
+    const optAll = filterTag.querySelector('option[value="all"]');
+    if (optAll) {
+      optAll.textContent = t('filter_tag_all');
+      optAll.setAttribute('data-i18n', 'filter_tag_all');
+    }
+    const optNone = filterTag.querySelector('option[value="none"]');
+    if (optNone) {
+      optNone.textContent = t('filter_tag_none');
+      optNone.setAttribute('data-i18n', 'filter_tag_none');
+    }
+  }
   try {
     const res = await fetch(`${API_BASE}/tags`);
     const data = await res.json();

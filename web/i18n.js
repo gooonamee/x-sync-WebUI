@@ -1850,6 +1850,19 @@ function applyTranslations() {
   });
 
   // Update language select dropdowns if any
+  const filterTag = document.getElementById('filter-tag');
+  if (filterTag) {
+    const optAll = filterTag.querySelector('option[value="all"]');
+    if (optAll) {
+      optAll.textContent = t('filter_tag_all');
+      optAll.setAttribute('data-i18n', 'filter_tag_all');
+    }
+    const optNone = filterTag.querySelector('option[value="none"]');
+    if (optNone) {
+      optNone.textContent = t('filter_tag_none');
+      optNone.setAttribute('data-i18n', 'filter_tag_none');
+    }
+  }
   const langSelects = document.querySelectorAll('.lang-selector-select');
   langSelects.forEach(sel => {
     sel.value = currentLang;
