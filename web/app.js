@@ -270,6 +270,27 @@ function setupEventListeners() {
     }
   });
 
+
+  document.getElementById('share-to-discord')?.addEventListener('click', async () => {
+    if (!currentShareTweet) return;
+    const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
+    const text = (currentShareTweet.content || '').slice(0, 140);
+    const payload = text ? `${text}\n${tweetUrl}` : tweetUrl;
+    await copyTextToClipboard(payload);
+    showToast(t('share_discord_hint') || '已複製內容！正在前往 Discord...');
+    window.open('https://discord.com/channels/@me', '_blank');
+    closeSharePopup();
+  });
+
+  document.getElementById('share-to-whatsapp')?.addEventListener('click', () => {
+    if (!currentShareTweet) return;
+    const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
+    const text = (currentShareTweet.content || '').slice(0, 120);
+    const payload = text ? `${text} ${tweetUrl}` : tweetUrl;
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(payload)}`, '_blank', 'width=600,height=550');
+    closeSharePopup();
+  });
+
   document.getElementById('share-to-x')?.addEventListener('click', () => {
     if (!currentShareTweet) return;
     const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
