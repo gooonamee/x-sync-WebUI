@@ -984,6 +984,7 @@ const I18N_LOCALES = {
 
 // Current language - Default to Traditional Chinese 'zh-TW'
 let currentLang = localStorage.getItem('x_sync_lang') || 'zh-TW';
+window.currentLang = currentLang;
 
 function t(key, params = {}) {
   const dict = I18N_LOCALES[currentLang] || I18N_LOCALES['zh-TW'];
@@ -997,6 +998,7 @@ function t(key, params = {}) {
 function setLanguage(lang) {
   if (!I18N_LOCALES[lang]) lang = 'zh-TW';
   currentLang = lang;
+  window.currentLang = lang;
   localStorage.setItem('x_sync_lang', lang);
   document.documentElement.lang = lang;
   applyTranslations();

@@ -90,11 +90,23 @@ let activeContextCard = null;
 
 // Init
 document.addEventListener('DOMContentLoaded', () => {
-  if (typeof applyTranslations === 'function') {
-    applyTranslations();
+  try {
+    if (typeof applyTranslations === 'function') {
+      applyTranslations();
+    }
+  } catch (err) {
+    console.warn('applyTranslations non-fatal error:', err);
   }
-  setupEventListeners();
-  updateTabTitles();
+  try {
+    setupEventListeners();
+  } catch (err) {
+    console.error('setupEventListeners error:', err);
+  }
+  try {
+    updateTabTitles();
+  } catch (err) {
+    console.warn('updateTabTitles error:', err);
+  }
   loadStats();
   loadTags();
   loadTweets();
@@ -351,7 +363,8 @@ function setupEventListeners() {
     if (!currentShareTweet) return;
     const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
     const text = (currentShareTweet.content || '').slice(0, 120);
-    const shareUrl = 'https://x.com/intent/post?url=' + encodeURIComponent(tweetUrl) + '&text=' + encodeURIComponent(text ? text + '... ' : '');
+    const shareText = text ? `${text}... by X-Sync` : 'by X-Sync';
+    const shareUrl = 'https://x.com/intent/post?url=' + encodeURIComponent(tweetUrl) + '&text=' + encodeURIComponent(shareText);
     window.open(shareUrl, '_blank', 'width=600,height=550,location=no,toolbar=no');
     closeSharePopup();
   });
@@ -360,7 +373,7 @@ function setupEventListeners() {
     if (!currentShareTweet) return;
     const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
     const text = (currentShareTweet.content || '').slice(0, 120);
-    const payload = text ? (text + '\n' + tweetUrl) : tweetUrl;
+    const payload = text ? `${text}\n\n${tweetUrl}\n\nby X-Sync` : `${tweetUrl}\n\nby X-Sync`;
     window.open('https://www.threads.net/intent/post?text=' + encodeURIComponent(payload), '_blank', 'width=600,height=550');
     closeSharePopup();
   });
@@ -376,14 +389,16 @@ function setupEventListeners() {
     if (!currentShareTweet) return;
     const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
     const text = (currentShareTweet.content || '').slice(0, 120);
-    window.open('https://t.me/share/url?url=' + encodeURIComponent(tweetUrl) + '&text=' + encodeURIComponent(text), '_blank', 'width=600,height=550');
+    const tgText = text ? `${text}\n\nby X-Sync` : 'by X-Sync';
+    window.open('https://t.me/share/url?url=' + encodeURIComponent(tweetUrl) + '&text=' + encodeURIComponent(tgText), '_blank', 'width=600,height=550');
     closeSharePopup();
   });
 
   document.getElementById('share-to-facebook')?.addEventListener('click', () => {
     if (!currentShareTweet) return;
     const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
-    window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(tweetUrl), '_blank', 'width=600,height=550');
+    const fbQuote = text ? `${text} (by X-Sync)` : 'by X-Sync';
+    window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(tweetUrl) + '&quote=' + encodeURIComponent(fbQuote), '_blank', 'width=600,height=550');
     closeSharePopup();
   });
 
@@ -394,7 +409,7 @@ function setupEventListeners() {
       try {
         await navigator.share({
           title: currentShareTweet.author_name || 'X Post',
-          text: currentShareTweet.content || '',
+          text: (currentShareTweet.content ? `${currentShareTweet.content}\n\nby X-Sync` : 'by X-Sync'),
           url: tweetUrl
         });
       } catch (_) {}
@@ -816,7 +831,7 @@ function renderTweets(tweets) {
       const btn = e.currentTarget;
       const contentText = (tweet.content || '').trim();
       const urlText = tweet.tweet_url || `https://x.com/i/status/${tweet.id}`;
-      const copyPayload = contentText ? `${contentText}\n\n${urlText}` : urlText;
+      const copyPayload = contentText ? `${contentText}\n\n${urlText}\n\nby X-Sync` : `${urlText}\n\nby X-Sync`;
 
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1363,7 +1378,7 @@ async function sendToDiscordWebhook(channel, tweet, btnEl) {
     url: tweetUrl,
     color: 0x1D9BF0,
     footer: {
-      text: "X-Sync 典藏",
+      text: "X-Sync 典藏 · by X-Sync",
       icon_url: "https://abs.twimg.com/favicons/twitter.3.ico"
     },
     timestamp: tweet.created_at ? new Date(tweet.created_at).toISOString() : new Date().toISOString()
