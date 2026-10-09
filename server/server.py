@@ -96,6 +96,65 @@ class XSyncHandler(http.server.SimpleHTTPRequestHandler):
             })
             return
 
+        elif path == '/api/video/resolve':
+            query = urllib.parse.parse_qs(parsed.query)
+            tweet_id = query.get('id', [''])[0]
+            if not tweet_id:
+                self.send_json({"status": "error", "message": "Missing tweet id"}, status=400)
+                return
+
+            video_url = None
+            thumb_url = None
+
+            # 1. Try fxtwitter API
+            try:
+                fx_url = f"https://api.fxtwitter.com/i/status/{tweet_id}"
+                req = urllib.request.Request(fx_url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+                with urllib.request.urlopen(req, timeout=5) as resp:
+                    if resp.status == 200:
+                        data = json.loads(resp.read().decode('utf-8'))
+                        media = data.get('tweet', {}).get('media', {})
+                        videos = media.get('videos', [])
+                        if videos and len(videos) > 0:
+                            video_url = videos[0].get('url')
+                            thumb_url = videos[0].get('thumbnail_url')
+            except Exception:
+                pass
+
+            # 2. Try syndication API
+            if not video_url:
+                try:
+                    syn_url = f"https://cdn.syndication.twimg.com/tweet-result?id={tweet_id}&token=!"
+                    req = urllib.request.Request(syn_url, headers={'User-Agent': 'Mozilla/5.0'})
+                    with urllib.request.urlopen(req, timeout=5) as resp:
+                        if resp.status == 200:
+                            data = json.loads(resp.read().decode('utf-8'))
+                            media_details = data.get('mediaDetails', [])
+                            for m in media_details:
+                                if m.get('type') == 'video':
+                                    variants = m.get('video_info', {}).get('variants', [])
+                                    mp4s = [v for v in variants if v.get('content_type') == 'video/mp4']
+                                    if mp4s:
+                                        mp4s.sort(key=lambda x: x.get('bitrate', 0), reverse=True)
+                                        video_url = mp4s[0].get('url')
+                                        thumb_url = m.get('media_url_https')
+                                        break
+                except Exception:
+                    pass
+
+            if video_url:
+                self.send_json({
+                    "status": "success",
+                    "video_url": video_url,
+                    "thumbnail_url": thumb_url
+                })
+            else:
+                self.send_json({
+                    "status": "error",
+                    "message": "Video stream not found"
+                }, status=404)
+            return
+
         elif path == '/api/tags':
             conn = get_db()
             cursor = conn.cursor()

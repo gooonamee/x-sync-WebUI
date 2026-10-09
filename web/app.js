@@ -1874,38 +1874,120 @@ let currentLightboxIndex = 0;
 
 
 function playInlineVideo(wrapper, tweet) {
-  if (!wrapper || wrapper.classList.contains('playing')) return;
-
-  const mediaUrls = tweet.media_urls || [];
-  const localPaths = tweet.local_media_paths || [];
+  if (!wrapper) return;
   const tweetUrl = tweet.tweet_url || ('https://x.com/i/status/' + tweet.id);
 
-  let videoSrc = '';
-  const mp4InLocal = localPaths.find(p => typeof p === 'string' && p.toLowerCase().includes('.mp4'));
-  const mp4InMedia = mediaUrls.find(u => typeof u === 'string' && u.toLowerCase().includes('.mp4'));
+  // If already playing video, toggle play/pause
+  if (wrapper.classList.contains('playing') && wrapper.querySelector('video')) {
+    const v = wrapper.querySelector('video');
+    if (v.paused) v.play(); else v.pause();
+    return;
+  }
 
-  if (mp4InLocal) {
-    videoSrc = '/media/' + mp4InLocal;
-  } else if (mp4InMedia) {
-    videoSrc = mp4InMedia;
+  // Check if local or direct mp4 is already known
+  const localPaths = tweet.local_media_paths || [];
+  const mediaUrls = tweet.media_urls || [];
+  let videoSrc = localPaths.find(p => typeof p === 'string' && p.toLowerCase().includes('.mp4'));
+  if (videoSrc) {
+    videoSrc = '/media/' + videoSrc;
+  } else {
+    videoSrc = mediaUrls.find(u => typeof u === 'string' && u.toLowerCase().includes('.mp4'));
   }
 
   wrapper.classList.add('playing');
+  wrapper.innerHTML = `
+    <div class="pure-video-loading">
+      <div class="video-loading-spinner"></div>
+      <span>載入純淨影片串流中...</span>
+    </div>
+  `;
+
+  const renderPurePlayer = (src) => {
+    wrapper.innerHTML = `
+      <div class="pure-video-container">
+        <video src="${src}" controls autoplay playsinline class="pure-video-player"></video>
+        <div class="pure-video-top-bar">
+          <button type="button" class="btn-pure-fullscreen" title="全螢幕播放">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+            </svg>
+            <span>全螢幕</span>
+          </button>
+          <a href="${tweetUrl}" target="_blank" rel="noopener noreferrer" class="btn-pure-watch-x" title="在 X 上觀看原推">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+            <span>在 X 上觀看 ↗</span>
+          </a>
+        </div>
+      </div>
+    `;
+
+    const vEl = wrapper.querySelector('video');
+    const fsBtn = wrapper.querySelector('.btn-pure-fullscreen');
+    if (fsBtn && vEl) {
+      fsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (vEl.requestFullscreen) {
+          vEl.requestFullscreen();
+        } else if (vEl.webkitRequestFullscreen) {
+          vEl.webkitRequestFullscreen();
+        }
+      });
+    }
+  };
+
+  const renderFallback = () => {
+    wrapper.innerHTML = `
+      <div class="pure-video-fallback">
+        <p style="margin: 0; font-size: 13px; font-weight: 500;">此影片為 X 加密串流，可直接前往 X 觀看</p>
+        <a href="${tweetUrl}" target="_blank" rel="noopener noreferrer" class="btn-fallback-x">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+          <span>在 X 上觀看影片 ↗</span>
+        </a>
+      </div>
+    `;
+  };
 
   if (videoSrc) {
-    wrapper.innerHTML = '<div class="inline-video-container">' +
-      '<video src="' + videoSrc + '" controls autoplay playsinline loop class="card-inline-video"></video>' +
-      '<a href="' + tweetUrl + '" target="_blank" rel="noopener noreferrer" class="inline-video-x-link" title="在 X 觀看原推">在 X 觀看 ↗</a>' +
-      '</div>';
-  } else {
-    const isDark = document.body.classList.contains('dark-theme');
-    const theme = isDark ? 'dark' : 'light';
-    wrapper.innerHTML = '<div class="inline-video-container">' +
-      '<iframe src="https://platform.twitter.com/embed/Tweet.html?id=' + tweet.id + '&theme=' + theme + '&dnt=true" ' +
-      'class="card-inline-iframe" allow="autoplay; fullscreen" frameborder="0" loading="lazy"></iframe>' +
-      '<a href="' + tweetUrl + '" target="_blank" rel="noopener noreferrer" class="inline-video-x-link" title="在 X 觀看原推">在 X 觀看 ↗</a>' +
-      '</div>';
+    renderPurePlayer(videoSrc);
+    return;
   }
+
+  // Resolve video stream URL asynchronously
+  (async () => {
+    let resolvedUrl = '';
+    // 1. Try local server resolver
+    try {
+      const res = await fetch(`${API_BASE}/video/resolve?id=${tweet.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.video_url) resolvedUrl = data.video_url;
+      }
+    } catch (_) {}
+
+    // 2. Direct client-side resolver fallback
+    if (!resolvedUrl) {
+      try {
+        const resFx = await fetch(`https://api.fxtwitter.com/i/status/${tweet.id}`);
+        if (resFx.ok) {
+          const dataFx = await resFx.json();
+          const vids = dataFx.tweet?.media?.videos || [];
+          if (vids.length > 0 && vids[0].url) {
+            resolvedUrl = vids[0].url;
+          }
+        }
+      } catch (_) {}
+    }
+
+    if (resolvedUrl) {
+      renderPurePlayer(resolvedUrl);
+    } else {
+      renderFallback();
+    }
+  })();
 }
 
 function openMediaLightbox(tweet, type, idx = 0) {
@@ -1968,17 +2050,54 @@ function renderLightboxContent() {
     if (counter) counter.style.display = 'none';
     if (prevBtn) prevBtn.style.display = 'none';
     if (nextBtn) nextBtn.style.display = 'none';
-    if (originText) originText.textContent = '在 X.com 觀看完整影片 ↗';
+    if (originText) originText.textContent = '在 X.com 觀看原推 ↗';
 
-    const mp4Url = mediaUrls.find(u => typeof u === 'string' && u.toLowerCase().includes('.mp4'));
+    let mp4Url = mediaUrls.find(u => typeof u === 'string' && u.toLowerCase().includes('.mp4'));
+    if (!mp4Url && tweet.local_media_paths) {
+      const p = tweet.local_media_paths.find(p => typeof p === 'string' && p.toLowerCase().includes('.mp4'));
+      if (p) mp4Url = '/media/' + p;
+    }
+
     if (mp4Url) {
-      stage.innerHTML = `
-        <video src="${mp4Url}" class="lightbox-video" controls autoplay playsinline loop></video>
-      `;
+      stage.innerHTML = '<video src="' + mp4Url + '" class="lightbox-video" controls autoplay playsinline loop></video>';
     } else {
-      stage.innerHTML = `
-        <iframe src="https://platform.twitter.com/embed/Tweet.html?id=${tweet.id}&theme=dark" class="lightbox-tweet-iframe" allow="autoplay; fullscreen" frameborder="0"></iframe>
-      `;
+      stage.innerHTML = '<div class="pure-video-loading" style="background: transparent;">' +
+        '<div class="video-loading-spinner"></div>' +
+        '<span>正在載入純淨影片串流...</span>' +
+        '</div>';
+
+      (async () => {
+        let vSrc = '';
+        try {
+          const res = await fetch(`${API_BASE}/video/resolve?id=${tweet.id}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.video_url) vSrc = data.video_url;
+          }
+        } catch (_) {}
+
+        if (!vSrc) {
+          try {
+            const resFx = await fetch(`https://api.fxtwitter.com/i/status/${tweet.id}`);
+            if (resFx.ok) {
+              const dataFx = await resFx.json();
+              const vids = dataFx.tweet?.media?.videos || [];
+              if (vids.length > 0 && vids[0].url) vSrc = vids[0].url;
+            }
+          } catch (_) {}
+        }
+
+        if (vSrc) {
+          stage.innerHTML = '<video src="' + vSrc + '" class="lightbox-video" controls autoplay playsinline loop></video>';
+        } else {
+          stage.innerHTML = '<div class="pure-video-fallback" style="background: rgba(15,23,42,0.85); max-width: 400px; margin: auto;">' +
+            '<p style="margin: 0; font-size: 13px; font-weight: 500;">此影片為 X 加密串流，可直接前往 X 觀看</p>' +
+            '<a href="' + tweetUrl + '" target="_blank" rel="noopener noreferrer" class="btn-fallback-x">' +
+            '<span>在 X 上觀看影片 ↗</span>' +
+            '</a>' +
+            '</div>';
+        }
+      })();
     }
   } else {
     if (originText) originText.textContent = '在 X.com 查看原推內容 ↗';
