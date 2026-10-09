@@ -1,6 +1,10 @@
 // X sync i18n Translation Dictionary
 const I18N_LOCALES = {
   'zh-TW': {
+    modal_close_btn: '關閉視窗',
+    discord_prompt_name: '請輸入頻道自訂名稱！',
+    discord_prompt_url: '請貼上有效的 Discord Webhook 完整網址！',
+    discord_saved_toast: '已成功儲存 Discord 頻道！',
     name: '繁體中文',
     app_name: 'X sync',
     nav_bookmarks: '書籤',
@@ -163,6 +167,10 @@ const I18N_LOCALES = {
   },
 
   'en': {
+    modal_close_btn: 'Close',
+    discord_prompt_name: 'Please enter a channel name!',
+    discord_prompt_url: 'Please enter a valid Discord Webhook URL!',
+    discord_saved_toast: 'Discord channel saved!',
     name: 'English',
     app_name: 'X sync',
     nav_bookmarks: 'Bookmarks',
@@ -322,6 +330,10 @@ const I18N_LOCALES = {
   },
 
   'de': {
+    modal_close_btn: 'Schließen',
+    discord_prompt_name: 'Bitte Kanalnamen eingeben!',
+    discord_prompt_url: 'Bitte gültige Webhook-URL eingeben!',
+    discord_saved_toast: 'Kanal gespeichert!',
     name: 'Deutsch',
     app_name: 'X sync',
     nav_bookmarks: 'Lesezeichen',
@@ -481,6 +493,10 @@ const I18N_LOCALES = {
   },
 
   'fr': {
+    modal_close_btn: 'Fermer',
+    discord_prompt_name: 'Veuillez saisir un nom de salon !',
+    discord_prompt_url: 'Veuillez saisir une URL Webhook valide !',
+    discord_saved_toast: 'Salon Discord enregistré !',
     name: 'Français',
     app_name: 'X sync',
     nav_bookmarks: 'Signets',
@@ -640,6 +656,10 @@ const I18N_LOCALES = {
   },
 
   'es': {
+    modal_close_btn: 'Cerrar',
+    discord_prompt_name: '¡Por favor ingresa el nombre del canal!',
+    discord_prompt_url: '¡Por favor ingresa una URL de Webhook válida!',
+    discord_saved_toast: '¡Canal de Discord guardado!',
     name: 'Español',
     app_name: 'X sync',
     nav_bookmarks: 'Marcadores',
@@ -799,6 +819,10 @@ const I18N_LOCALES = {
   },
 
   'zh-CN': {
+    modal_close_btn: '关闭窗口',
+    discord_prompt_name: '请输入频道自定义名称！',
+    discord_prompt_url: '请粘贴有效的 Discord Webhook 完整网址！',
+    discord_saved_toast: '已成功保存 Discord 频道！',
     name: '简体中文',
     app_name: 'X sync',
     nav_bookmarks: '书签',

@@ -1590,23 +1590,67 @@ body {
   color: #1D9BF0;
 }
 
+/* Global Form Input Styling */
+.form-input {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  height: 40px !important;
+  padding: 8px 12px !important;
+  font-size: 13.5px !important;
+  color: #0F1419 !important;
+  background-color: #FFFFFF !important;
+  border: 1px solid #CFD9DE !important;
+  border-radius: 8px !important;
+  outline: none !important;
+  display: block !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
 
-/* Discord Channel Selection Modal Styling */
+.form-input:focus {
+  border-color: #1D9BF0 !important;
+  box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.15) !important;
+}
+
+.required-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #EF4444;
+  background: #FEF2F2;
+  border: 1px solid #FCA5A5;
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* Discord Modal Specifics */
 .discord-tweet-preview {
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
   border-radius: 10px;
-  padding: 10px 12px;
-  margin-bottom: 16px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
   font-size: 13px;
   color: #334155;
   max-height: 80px;
   overflow-y: auto;
-  line-height: 1.4;
+  line-height: 1.45;
+}
+
+.discord-guide-tip {
+  background: #F0F4F8;
+  border-left: 4px solid #5865F2;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #334155;
+  margin-bottom: 14px;
 }
 
 .discord-channel-section {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .discord-section-header {
@@ -1618,7 +1662,7 @@ body {
 
 .discord-section-title {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: #0F1419;
 }
 
@@ -1721,19 +1765,19 @@ body {
 }
 
 .discord-add-form {
-  background: #F8FAFC;
+  background: #FFFFFF;
   border: 1px solid #E2E8F0;
   border-radius: 12px;
-  padding: 14px;
+  padding: 16px;
   margin-top: 10px;
 }
 
-.discord-empty-channels {
-  padding: 16px;
-  text-align: center;
-  color: #64748B;
-  font-size: 13px;
-  background: #F8FAFC;
-  border-radius: 8px;
-  border: 1px dashed #CBD5E1;
+.discord-form-header {
+  margin-bottom: 12px;
+}
+
+.discord-form-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0F1419;
 }
