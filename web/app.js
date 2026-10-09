@@ -835,7 +835,7 @@ function renderTweets(tweets) {
     card.querySelectorAll('.media-video-wrapper').forEach(wrapper => {
       wrapper.addEventListener('click', (e) => {
         e.stopPropagation();
-        openMediaLightbox(tweet, 'video', 0);
+        playInlineVideo(wrapper, tweet);
       });
     });
 
@@ -1871,6 +1871,42 @@ async function sendToDiscordWebhook(channel, tweet, btnEl) {
 let currentLightboxTweet = null;
 let currentLightboxType = 'photo';
 let currentLightboxIndex = 0;
+
+
+function playInlineVideo(wrapper, tweet) {
+  if (!wrapper || wrapper.classList.contains('playing')) return;
+
+  const mediaUrls = tweet.media_urls || [];
+  const localPaths = tweet.local_media_paths || [];
+  const tweetUrl = tweet.tweet_url || ('https://x.com/i/status/' + tweet.id);
+
+  let videoSrc = '';
+  const mp4InLocal = localPaths.find(p => typeof p === 'string' && p.toLowerCase().includes('.mp4'));
+  const mp4InMedia = mediaUrls.find(u => typeof u === 'string' && u.toLowerCase().includes('.mp4'));
+
+  if (mp4InLocal) {
+    videoSrc = '/media/' + mp4InLocal;
+  } else if (mp4InMedia) {
+    videoSrc = mp4InMedia;
+  }
+
+  wrapper.classList.add('playing');
+
+  if (videoSrc) {
+    wrapper.innerHTML = '<div class="inline-video-container">' +
+      '<video src="' + videoSrc + '" controls autoplay playsinline loop class="card-inline-video"></video>' +
+      '<a href="' + tweetUrl + '" target="_blank" rel="noopener noreferrer" class="inline-video-x-link" title="在 X 觀看原推">在 X 觀看 ↗</a>' +
+      '</div>';
+  } else {
+    const isDark = document.body.classList.contains('dark-theme');
+    const theme = isDark ? 'dark' : 'light';
+    wrapper.innerHTML = '<div class="inline-video-container">' +
+      '<iframe src="https://platform.twitter.com/embed/Tweet.html?id=' + tweet.id + '&theme=' + theme + '&dnt=true" ' +
+      'class="card-inline-iframe" allow="autoplay; fullscreen" frameborder="0" loading="lazy"></iframe>' +
+      '<a href="' + tweetUrl + '" target="_blank" rel="noopener noreferrer" class="inline-video-x-link" title="在 X 觀看原推">在 X 觀看 ↗</a>' +
+      '</div>';
+  }
+}
 
 function openMediaLightbox(tweet, type, idx = 0) {
   currentLightboxTweet = tweet;
