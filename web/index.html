@@ -673,6 +673,47 @@
     </div>
   </div>
 
+    <!-- Media Lightbox / Fullscreen Viewer Modal -->
+  <div class="media-lightbox" id="media-lightbox" style="display: none;">
+    <div class="lightbox-overlay" id="lightbox-overlay"></div>
+    <div class="lightbox-container">
+      <button class="lightbox-close-btn" id="btn-close-lightbox" title="關閉 (Esc)">&times;</button>
+      
+      <!-- Top info bar: author & count -->
+      <div class="lightbox-header">
+        <div class="lightbox-author-info" id="lightbox-author-info"></div>
+        <div class="lightbox-counter" id="lightbox-counter" style="display: none;">1 / 1</div>
+      </div>
+
+      <!-- Main Media Stage -->
+      <div class="lightbox-stage" id="lightbox-stage"></div>
+
+      <!-- Prev / Next Navigation Arrows for multi-photo posts -->
+      <button class="lightbox-nav-btn lightbox-prev" id="btn-lightbox-prev" title="上一張 (←)" style="display: none;">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button class="lightbox-nav-btn lightbox-next" id="btn-lightbox-next" title="下一張 (→)" style="display: none;">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+
+      <!-- Bottom action bar -->
+      <div class="lightbox-footer">
+        <a class="lightbox-origin-btn" id="lightbox-origin-link" href="#" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          <span id="lightbox-origin-text">在 X.com 觀看原內容 ↗</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
   <div id="global-toast"></div>
   <script src="i18n.js?v=20261009_byxsync"></script>
   <script src="app.js?v=20261009_byxsync"></script>
