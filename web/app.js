@@ -343,27 +343,32 @@ function setupEventListeners() {
     }
   });
 
-  document.getElementById('share-to-discord')?.addEventListener('click', () => {
+    document.getElementById('share-to-discord')?.addEventListener('click', () => {
     if (!currentShareTweet) return;
     openDiscordModal(currentShareTweet);
   });
 
   document.getElementById('share-to-whatsapp')?.addEventListener('click', async () => {
     if (!currentShareTweet) return;
-    const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
-    const content = (currentShareTweet.content || '').trim();
-    const payload = content ? (content + '\n\n' + tweetUrl) : tweetUrl;
+    const payload = formatSharePayload(currentShareTweet);
+
+    // 1. Copy text to clipboard with by X-sync
     await copyTextToClipboard(payload);
+
+    // 2. Visual Toast notification
     showToast(t('share_whatsapp_hint') || '已複製推文！正在開啟 WhatsApp（可傳送給聯絡人或新增至「我的動態」）');
-    window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(payload), '_blank');
+
+    // 3. Open WhatsApp with prefilled payload
+    const waUrl = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(payload);
+    window.open(waUrl, '_blank');
+
     closeSharePopup();
   });
 
   document.getElementById('share-to-x')?.addEventListener('click', () => {
     if (!currentShareTweet) return;
     const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
-    const text = (currentShareTweet.content || '').slice(0, 120);
-    const shareText = text ? `${text}... by X-Sync` : 'by X-Sync';
+    const shareText = formatSharePayload(currentShareTweet, { shortTextOnly: true });
     const shareUrl = 'https://x.com/intent/post?url=' + encodeURIComponent(tweetUrl) + '&text=' + encodeURIComponent(shareText);
     window.open(shareUrl, '_blank', 'width=600,height=550,location=no,toolbar=no');
     closeSharePopup();
@@ -371,9 +376,7 @@ function setupEventListeners() {
 
   document.getElementById('share-to-threads')?.addEventListener('click', () => {
     if (!currentShareTweet) return;
-    const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
-    const text = (currentShareTweet.content || '').slice(0, 120);
-    const payload = text ? `${text}\n\n${tweetUrl}\n\nby X-Sync` : `${tweetUrl}\n\nby X-Sync`;
+    const payload = formatSharePayload(currentShareTweet);
     window.open('https://www.threads.net/intent/post?text=' + encodeURIComponent(payload), '_blank', 'width=600,height=550');
     closeSharePopup();
   });
@@ -381,15 +384,15 @@ function setupEventListeners() {
   document.getElementById('share-to-line')?.addEventListener('click', () => {
     if (!currentShareTweet) return;
     const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
-    window.open('https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(tweetUrl), '_blank', 'width=600,height=550');
+    const payload = formatSharePayload(currentShareTweet);
+    window.open('https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(tweetUrl) + '&text=' + encodeURIComponent(payload), '_blank', 'width=600,height=550');
     closeSharePopup();
   });
 
   document.getElementById('share-to-telegram')?.addEventListener('click', () => {
     if (!currentShareTweet) return;
     const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
-    const text = (currentShareTweet.content || '').slice(0, 120);
-    const tgText = text ? `${text}\n\nby X-Sync` : 'by X-Sync';
+    const tgText = formatSharePayload(currentShareTweet);
     window.open('https://t.me/share/url?url=' + encodeURIComponent(tweetUrl) + '&text=' + encodeURIComponent(tgText), '_blank', 'width=600,height=550');
     closeSharePopup();
   });
@@ -397,7 +400,8 @@ function setupEventListeners() {
   document.getElementById('share-to-facebook')?.addEventListener('click', () => {
     if (!currentShareTweet) return;
     const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
-    const fbQuote = text ? `${text} (by X-Sync)` : 'by X-Sync';
+    const text = (currentShareTweet.content || '').slice(0, 100);
+    const fbQuote = text ? `${text} (by X-sync)` : 'by X-sync';
     window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(tweetUrl) + '&quote=' + encodeURIComponent(fbQuote), '_blank', 'width=600,height=550');
     closeSharePopup();
   });
@@ -405,16 +409,17 @@ function setupEventListeners() {
   document.getElementById('share-to-native')?.addEventListener('click', async () => {
     if (!currentShareTweet) return;
     const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
+    const payload = formatSharePayload(currentShareTweet);
     if (navigator.share) {
       try {
         await navigator.share({
           title: currentShareTweet.author_name || 'X Post',
-          text: (currentShareTweet.content ? `${currentShareTweet.content}\n\nby X-Sync` : 'by X-Sync'),
+          text: payload,
           url: tweetUrl
         });
       } catch (_) {}
     } else {
-      await copyTextToClipboard(tweetUrl);
+      await copyTextToClipboard(payload);
       showToast(t('share_link_copied'));
     }
     closeSharePopup();
@@ -430,8 +435,7 @@ function setupEventListeners() {
 
   document.getElementById('share-copy-quote')?.addEventListener('click', async () => {
     if (!currentShareTweet) return;
-    const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
-    const quoteText = '> ' + (currentShareTweet.content || '') + '\n\n— ' + (currentShareTweet.author_name || '') + ' (@' + (currentShareTweet.author_handle || '') + ')\n🔗 [查看原文](' + tweetUrl + ')';
+    const quoteText = formatSharePayload(currentShareTweet, { quoteMarkdown: true });
     await copyTextToClipboard(quoteText);
     showToast(t('share_quote_copied'));
     closeSharePopup();
@@ -831,7 +835,7 @@ function renderTweets(tweets) {
       const btn = e.currentTarget;
       const contentText = (tweet.content || '').trim();
       const urlText = tweet.tweet_url || `https://x.com/i/status/${tweet.id}`;
-      const copyPayload = contentText ? `${contentText}\n\n${urlText}\n\nby X-Sync` : `${urlText}\n\nby X-Sync`;
+      const copyPayload = formatSharePayload(tweet);
 
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1183,6 +1187,24 @@ async function handleCreateTagInModal() {
 
 // Right-Click Context Tag Popup Functions
 
+function formatSharePayload(tweet, options = {}) {
+  const content = (tweet.content || '').trim();
+  const url = tweet.tweet_url || ('https://x.com/i/status/' + tweet.id);
+  const byTag = 'by X-sync';
+
+  if (options.quoteMarkdown) {
+    const author = tweet.author_name ? `${tweet.author_name} (@${tweet.author_handle})` : `@${tweet.author_handle}`;
+    return `> ${content || '(無文字內容)'}\n\n— ${author}\n🔗 [查看原文](${url})\n\n${byTag}`;
+  }
+
+  if (options.shortTextOnly) {
+    const snippet = content.slice(0, 110);
+    return snippet ? `${snippet}... ${byTag}` : byTag;
+  }
+
+  return content ? `${content}\n\n${url}\n\n${byTag}` : `${url}\n\n${byTag}`;
+}
+
 async function copyTextToClipboard(text) {
   try {
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1378,7 +1400,7 @@ async function sendToDiscordWebhook(channel, tweet, btnEl) {
     url: tweetUrl,
     color: 0x1D9BF0,
     footer: {
-      text: "X-Sync 典藏 · by X-Sync",
+      text: "X-Sync 典藏 · by X-sync",
       icon_url: "https://abs.twimg.com/favicons/twitter.3.ico"
     },
     timestamp: tweet.created_at ? new Date(tweet.created_at).toISOString() : new Date().toISOString()
