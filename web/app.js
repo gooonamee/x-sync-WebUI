@@ -64,6 +64,9 @@ const manageTagsList = document.getElementById('manage-tags-list');
 const manageTagsTotalCount = document.getElementById('manage-tags-total-count');
 
 const syncGuideModal = document.getElementById('sync-guide-modal');
+const sharePopup = document.getElementById('share-popup');
+const btnCloseSharePopup = document.getElementById('btn-close-share-popup');
+let currentShareTweet = null;
 const btnCloseGuide = document.getElementById('btn-close-guide');
 const btnGuideOk = document.getElementById('btn-guide-ok');
 
@@ -246,11 +249,112 @@ function setupEventListeners() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeContextMenuTagPopup();
+      closeSharePopup();
     }
   });
 
   btnCloseGuide.addEventListener('click', () => syncGuideModal.style.display = 'none');
   btnGuideOk.addEventListener('click', () => syncGuideModal.style.display = 'none');
+
+
+  // Share Popup Event Listeners
+  if (btnCloseSharePopup) {
+    btnCloseSharePopup.addEventListener('click', closeSharePopup);
+  }
+
+  document.addEventListener('mousedown', (e) => {
+    if (sharePopup && sharePopup.style.display !== 'none') {
+      if (!sharePopup.contains(e.target) && !e.target.closest('.btn-card-share') && !e.target.closest('#btn-context-share')) {
+        closeSharePopup();
+      }
+    }
+  });
+
+  document.getElementById('share-to-x')?.addEventListener('click', () => {
+    if (!currentShareTweet) return;
+    const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
+    const text = (currentShareTweet.content || '').slice(0, 120);
+    const shareUrl = 'https://x.com/intent/post?url=' + encodeURIComponent(tweetUrl) + '&text=' + encodeURIComponent(text ? text + '... ' : '');
+    window.open(shareUrl, '_blank', 'width=600,height=550,location=no,toolbar=no');
+    closeSharePopup();
+  });
+
+  document.getElementById('share-to-threads')?.addEventListener('click', () => {
+    if (!currentShareTweet) return;
+    const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
+    const text = (currentShareTweet.content || '').slice(0, 120);
+    const payload = text ? (text + '\n' + tweetUrl) : tweetUrl;
+    window.open('https://www.threads.net/intent/post?text=' + encodeURIComponent(payload), '_blank', 'width=600,height=550');
+    closeSharePopup();
+  });
+
+  document.getElementById('share-to-line')?.addEventListener('click', () => {
+    if (!currentShareTweet) return;
+    const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
+    window.open('https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(tweetUrl), '_blank', 'width=600,height=550');
+    closeSharePopup();
+  });
+
+  document.getElementById('share-to-telegram')?.addEventListener('click', () => {
+    if (!currentShareTweet) return;
+    const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
+    const text = (currentShareTweet.content || '').slice(0, 120);
+    window.open('https://t.me/share/url?url=' + encodeURIComponent(tweetUrl) + '&text=' + encodeURIComponent(text), '_blank', 'width=600,height=550');
+    closeSharePopup();
+  });
+
+  document.getElementById('share-to-facebook')?.addEventListener('click', () => {
+    if (!currentShareTweet) return;
+    const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
+    window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(tweetUrl), '_blank', 'width=600,height=550');
+    closeSharePopup();
+  });
+
+  document.getElementById('share-to-native')?.addEventListener('click', async () => {
+    if (!currentShareTweet) return;
+    const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: currentShareTweet.author_name || 'X Post',
+          text: currentShareTweet.content || '',
+          url: tweetUrl
+        });
+      } catch (_) {}
+    } else {
+      await copyTextToClipboard(tweetUrl);
+      showToast(t('share_link_copied'));
+    }
+    closeSharePopup();
+  });
+
+  document.getElementById('share-copy-link')?.addEventListener('click', async () => {
+    if (!currentShareTweet) return;
+    const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
+    await copyTextToClipboard(tweetUrl);
+    showToast(t('share_link_copied'));
+    closeSharePopup();
+  });
+
+  document.getElementById('share-copy-quote')?.addEventListener('click', async () => {
+    if (!currentShareTweet) return;
+    const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
+    const quoteText = '> ' + (currentShareTweet.content || '') + '\n\n— ' + (currentShareTweet.author_name || '') + ' (@' + (currentShareTweet.author_handle || '') + ')\n🔗 [查看原文](' + tweetUrl + ')';
+    await copyTextToClipboard(quoteText);
+    showToast(t('share_quote_copied'));
+    closeSharePopup();
+  });
+
+  document.getElementById('btn-context-share')?.addEventListener('click', (e) => {
+    if (!currentContextTweet) return;
+    const tweet = currentContextTweet;
+    const card = activeContextCard;
+    closeContextMenuTagPopup();
+    if (card) {
+      const sBtn = card.querySelector('.btn-card-share') || card;
+      openSharePopup(tweet, sBtn);
+    }
+  });
 
   document.querySelectorAll('input[name="export-mode"]').forEach(r => {
     r.addEventListener('change', updateMarkdownPreview);
@@ -558,6 +662,13 @@ function renderTweets(tweets) {
 
       <div class="card-footer">
         <div class="tools-group">
+          <button type="button" class="tool-icon-btn btn-card-share" data-id="${tweet.id}" title="${t('card_tooltip_share')}">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+              <polyline points="16 6 12 2 8 6"></polyline>
+              <line x1="12" y1="2" x2="12" y2="15"></line>
+            </svg>
+          </button>
           <button class="tool-icon-btn btn-card-copy" title="${t('card_tooltip_copy')}">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -608,6 +719,14 @@ function renderTweets(tweets) {
       e.preventDefault();
       openContextMenuTagPopup(tweet, card, e.clientX, e.clientY);
     });
+
+    const shareBtn = card.querySelector('.btn-card-share');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openSharePopup(tweet, shareBtn);
+      });
+    }
 
     card.querySelector('.btn-card-tag').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -971,6 +1090,64 @@ async function handleCreateTagInModal() {
 }
 
 // Right-Click Context Tag Popup Functions
+
+async function copyTextToClipboard(text) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+  } catch (_) {}
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+}
+
+function openSharePopup(tweet, triggerBtn) {
+  closeSharePopup();
+  if (typeof closeContextMenuTagPopup === 'function') {
+    closeContextMenuTagPopup();
+  }
+
+  currentShareTweet = tweet;
+  if (!sharePopup) return;
+
+  sharePopup.style.display = 'block';
+
+  const rect = triggerBtn.getBoundingClientRect();
+  const popupRect = sharePopup.getBoundingClientRect();
+  const width = popupRect.width || 290;
+  const height = popupRect.height || 280;
+
+  let left = rect.left - (width / 2) + (rect.width / 2);
+  let top = rect.top - height - 8;
+
+  if (top < 12) {
+    top = rect.bottom + 8;
+  }
+  if (left + width > window.innerWidth - 12) {
+    left = window.innerWidth - width - 12;
+  }
+  if (left < 12) {
+    left = 12;
+  }
+
+  sharePopup.style.left = left + 'px';
+  sharePopup.style.top = top + 'px';
+}
+
+function closeSharePopup() {
+  if (sharePopup) {
+    sharePopup.style.display = 'none';
+  }
+  currentShareTweet = null;
+}
+
 function openContextMenuTagPopup(tweet, cardElement, clientX, clientY) {
   closeContextMenuTagPopup();
 

@@ -401,6 +401,94 @@
     </div>
   </div>
 
+  
+  <!-- Floating Share Popup -->
+  <div class="share-popup" id="share-popup" style="display: none;">
+    <div class="share-popup-header">
+      <div class="share-popup-title-wrap">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+          <polyline points="16 6 12 2 8 6"></polyline>
+          <line x1="12" y1="2" x2="12" y2="15"></line>
+        </svg>
+        <span class="share-popup-title" data-i18n="share_popup_title">再分享推文</span>
+      </div>
+      <button class="share-popup-close" id="btn-close-share-popup" title="關閉">&times;</button>
+    </div>
+    
+    <div class="share-popup-body">
+      <!-- Platform Quick Share Grid -->
+      <div class="share-grid">
+        <button type="button" class="share-action-btn btn-share-x" id="share-to-x" title="轉發至 X">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+          <span data-i18n="share_to_x">轉發至 X</span>
+        </button>
+
+        <button type="button" class="share-action-btn btn-share-threads" id="share-to-threads" title="分享至 Threads">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.88 12.38c-.37 1.63-1.63 2.76-3.41 2.76-2.12 0-3.66-1.55-3.66-3.68 0-2.17 1.58-3.72 3.79-3.72 1.48 0 2.58.74 3.01 2.01h-1.52c-.32-.61-.88-.95-1.49-.95-1.32 0-2.22.98-2.22 2.66 0 1.62.92 2.62 2.14 2.62 1.08 0 1.76-.62 1.95-1.7h-2.1v-1.25h3.51v1.25z"/>
+          </svg>
+          <span data-i18n="share_to_threads">Threads</span>
+        </button>
+
+        <button type="button" class="share-action-btn btn-share-line" id="share-to-line" title="分享至 LINE">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M12 3C6.477 3 2 6.953 2 11.828c0 4.364 3.585 8.016 8.441 8.707.329.071.776.218.89.5.102.253.066.65.033.905-.052.4-.241 1.543-.274 1.875-.046.467.214.457.45.312.285-.176 3.864-2.32 5.275-3.974C19.782 17.697 22 14.975 22 11.828 22 6.953 17.523 3 12 3z"/>
+          </svg>
+          <span data-i18n="share_to_line">LINE</span>
+        </button>
+
+        <button type="button" class="share-action-btn btn-share-telegram" id="share-to-telegram" title="分享至 Telegram">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+          </svg>
+          <span data-i18n="share_to_telegram">Telegram</span>
+        </button>
+
+        <button type="button" class="share-action-btn btn-share-facebook" id="share-to-facebook" title="分享至 Facebook">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/>
+          </svg>
+          <span data-i18n="share_to_facebook">Facebook</span>
+        </button>
+
+        <button type="button" class="share-action-btn btn-share-native" id="share-to-native" title="系統原生分享">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          <span data-i18n="share_to_native">更多分享</span>
+        </button>
+      </div>
+
+      <div class="share-divider"></div>
+
+      <!-- Quick Copy Actions -->
+      <div class="share-copy-list">
+        <button type="button" class="share-copy-item" id="share-copy-link">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          </svg>
+          <span data-i18n="share_copy_link">複製原推連結</span>
+        </button>
+
+        <button type="button" class="share-copy-item" id="share-copy-quote">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path>
+            <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path>
+          </svg>
+          <span data-i18n="share_copy_quote">複製 Markdown 引用卡片</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Right-Click Context Tag Popup -->
   <div class="context-tag-popup" id="context-tag-popup" style="display: none;">
     <div class="context-tag-header">
@@ -431,6 +519,18 @@
       <div class="context-quick-section" id="context-quick-section">
         <div class="context-sub-label" data-i18n="tag_context_quick">常用標籤 (點擊直接新增)：</div>
         <div class="context-quick-tags" id="context-quick-tags"></div>
+      </div>
+
+            <!-- Share Tweet Action Section -->
+      <div class="context-share-section">
+        <button type="button" class="btn-context-share" id="btn-context-share">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+            <polyline points="16 6 12 2 8 6"></polyline>
+            <line x1="12" y1="2" x2="12" y2="15"></line>
+          </svg>
+          <span data-i18n="card_tooltip_share">再分享推文</span>
+        </button>
       </div>
 
       <!-- Delete Tweet Action Section -->
