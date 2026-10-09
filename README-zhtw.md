@@ -10,7 +10,7 @@
 > ℹ️ **注意**：運行 X-sync WebUI 需要目標電腦已安裝 Python 3。
 
 - 🌐 **官方網站**：[https://www.gooo.name/tool/Browser/Xsync.html](https://www.gooo.name/tool/Browser/Xsync.html)
-- 📦 **X-sync Extension WebUI 倉庫**：[https://github.com/gooonamee/x-sync-WebUI](https://github.com/gooonamee/x-sync-WebUI)
+- 📦 **X-sync Extension WebUI 倉庫**：[https://github.com/gooonamee/xsync-webUI](https://github.com/gooonamee/xsync-webUI)
 
 ---
 
@@ -59,7 +59,7 @@
 ## 📁 目錄結構說明
 
 ```text
-x-sync-WebUI/
+xsync-webUI/
 ├── server/                     # 本地後端服務與資料庫
 │   ├── server.py               # HTTP API 伺服器 (預設連接埠 8765)
 │   ├── database.py             # SQLite 資料庫連線與結構定義

@@ -10,7 +10,7 @@ View your data locally with X-sync WebUI is easy. Just a few steps:
 > ℹ️ **Notice**: In order to run X-sync WebUI, it requires the target machine to already have Python 3 installed.
 
 - 🌐 **Official Website**: [https://www.gooo.name/tool/Browser/Xsync.html](https://www.gooo.name/tool/Browser/Xsync.html)
-- 📦 **X-sync Extension WebUI Repo**: [https://github.com/gooonamee/x-sync-WebUI](https://github.com/gooonamee/x-sync-WebUI)
+- 📦 **X-sync Extension WebUI Repo**: [https://github.com/gooonamee/xsync-webUI](https://github.com/gooonamee/xsync-webUI)
 
 ---
 
@@ -59,7 +59,7 @@ View your data locally with X-sync WebUI is easy. Just a few steps:
 ## 📁 Repository Structure
 
 ```text
-x-sync-WebUI/
+xsync-webUI/
 ├── server/                     # Local backend service & database
 │   ├── server.py               # HTTP API server (default port 8765)
 │   ├── database.py             # SQLite connection & schema initialization
