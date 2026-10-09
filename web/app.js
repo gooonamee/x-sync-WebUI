@@ -120,7 +120,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // React to language switch
 window.onLanguageChanged = function(lang) {
+  if (typeof applyTranslations === "function") { applyTranslations(); }
   updateTabTitles();
+  if (filterTag) {
+    const optAll = filterTag.querySelector('option[value="all"]');
+    if (optAll) optAll.textContent = t('filter_tag_all');
+    const optNone = filterTag.querySelector('option[value="none"]');
+    if (optNone) optNone.textContent = t('filter_tag_none');
+  }
+  loadTags();
   if (currentTab === 'history') {
     loadSyncHistory();
   } else {
@@ -540,8 +548,8 @@ async function loadTags() {
     // Populate dropdown
     const currentVal = filterTag.value;
     filterTag.innerHTML = `
-      <option value="all">${t('filter_tag_all')}</option>
-      <option value="none">${t('filter_tag_none')}</option>
+      <option value="all" data-i18n="filter_tag_all">${t('filter_tag_all')}</option>
+      <option value="none" data-i18n="filter_tag_none">${t('filter_tag_none')}</option>
     `;
     allTags.forEach(tItem => {
       const opt = document.createElement('option');
@@ -773,7 +781,7 @@ function renderTweets(tweets) {
     // Tags HTML
     const tagsHtml = (tweet.tags || []).map(tag => {
       const cnt = (allTags.find(t => t.name === tag)?.count);
-      const countTip = (cnt !== undefined && cnt !== null) ? ` (${cnt} 則貼文)` : '';
+      const countTip = (cnt !== undefined && cnt !== null) ? ` (${(t('tag_tweet_count') || '{n} 則貼文').replace('{n}', cnt)})` : '';
       return `<span class="card-tag-pill" title="#${escapeHtml(tag)}${countTip}">#${escapeHtml(tag)}</span>`;
     }).join('');
 
@@ -1041,7 +1049,7 @@ function renderManageTagsList() {
   if (!manageTagsList) return;
   manageTagsList.innerHTML = '';
   if (manageTagsTotalCount) {
-    manageTagsTotalCount.textContent = `${allTags.length} 個標籤`;
+    manageTagsTotalCount.textContent = (t("tags_total_unit") || "{n} 個標籤").replace("{n}", allTags.length);
   }
 
   if (allTags.length === 0) {
@@ -2430,7 +2438,7 @@ async function openExportModal() {
 
   const countBadge = document.getElementById('export-items-count') || exportItemsCount;
   if (countBadge) {
-    countBadge.textContent = `${ids.length} 篇`;
+    countBadge.textContent = (t('export_items_unit') || '{n} 篇').replace('{n}', ids.length);
   }
   if (exportModal) {
     exportModal.style.display = 'flex';
