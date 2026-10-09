@@ -96,12 +96,140 @@ class XSyncHandler(http.server.SimpleHTTPRequestHandler):
             })
             return
 
+        elif path == '/api/video/stream':
+            query = urllib.parse.parse_qs(parsed.query)
+            target_url = query.get('url', [''])[0]
+            if not target_url:
+                self.send_response(400)
+                self.end_headers()
+                return
+
+            try:
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+                    'Referer': 'https://x.com/'
+                }
+                range_header = self.headers.get('Range')
+                if range_header:
+                    headers['Range'] = range_header
+
+                req = urllib.request.Request(target_url, headers=headers)
+                with urllib.request.urlopen(req, timeout=12) as resp:
+                    status_code = resp.status
+                    self.send_response(status_code)
+                    for h in ['Content-Type', 'Content-Length', 'Content-Range', 'Accept-Ranges']:
+                        val = resp.headers.get(h)
+                        if val:
+                            self.send_header(h, val)
+                    self.end_headers()
+
+                    while True:
+                        chunk = resp.read(64 * 1024)
+                        if not chunk:
+                            break
+                        self.wfile.write(chunk)
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.end_headers()
+                return
+
         elif path == '/api/video/resolve':
             query = urllib.parse.parse_qs(parsed.query)
             tweet_id = query.get('id', [''])[0]
+            author_handle = query.get('handle', [''])[0].replace('@', '')
             if not tweet_id:
                 self.send_json({"status": "error", "message": "Missing tweet id"}, status=400)
                 return
+
+            video_url = None
+            thumb_url = None
+
+            # Source 1: FxEmbed v2 API
+            try:
+                fx_url = f"https://api.fxtwitter.com/2/status/{tweet_id}"
+                req = urllib.request.Request(fx_url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+                with urllib.request.urlopen(req, timeout=6) as resp:
+                    if resp.status == 200:
+                        data = json.loads(resp.read().decode('utf-8'))
+                        tweet_data = data.get('tweet', {})
+                        media = tweet_data.get('media', {})
+                        videos = media.get('videos', [])
+                        if videos and len(videos) > 0:
+                            video_url = videos[0].get('url')
+                            thumb_url = videos[0].get('thumbnail_url')
+            except Exception:
+                pass
+
+            # Source 2: FxTwitter handle endpoint
+            if not video_url and author_handle:
+                try:
+                    fx_url = f"https://api.fxtwitter.com/{author_handle}/status/{tweet_id}"
+                    req = urllib.request.Request(fx_url, headers={'User-Agent': 'Mozilla/5.0'})
+                    with urllib.request.urlopen(req, timeout=5) as resp:
+                        if resp.status == 200:
+                            data = json.loads(resp.read().decode('utf-8'))
+                            media = data.get('tweet', {}).get('media', {})
+                            videos = media.get('videos', [])
+                            if videos and len(videos) > 0:
+                                video_url = videos[0].get('url')
+                                thumb_url = videos[0].get('thumbnail_url')
+                except Exception:
+                    pass
+
+            # Source 3: VxTwitter API
+            if not video_url:
+                try:
+                    vx_url = f"https://api.vxtwitter.com/Twitter/status/{tweet_id}"
+                    req = urllib.request.Request(vx_url, headers={'User-Agent': 'Mozilla/5.0'})
+                    with urllib.request.urlopen(req, timeout=5) as resp:
+                        if resp.status == 200:
+                            data = json.loads(resp.read().decode('utf-8'))
+                            video_url = data.get('video_url')
+                            if not video_url:
+                                media_urls = data.get('mediaURLs', [])
+                                for u in media_urls:
+                                    if '.mp4' in u or 'video' in u:
+                                        video_url = u
+                                        break
+                except Exception:
+                    pass
+
+            # Source 4: Syndication API fallback
+            if not video_url:
+                try:
+                    syn_url = f"https://cdn.syndication.twimg.com/tweet-result?id={tweet_id}&token=5"
+                    req = urllib.request.Request(syn_url, headers={'User-Agent': 'Mozilla/5.0'})
+                    with urllib.request.urlopen(req, timeout=5) as resp:
+                        if resp.status == 200:
+                            data = json.loads(resp.read().decode('utf-8'))
+                            media_details = data.get('mediaDetails', [])
+                            for m in media_details:
+                                if m.get('type') == 'video':
+                                    variants = m.get('video_info', {}).get('variants', [])
+                                    mp4s = [v for v in variants if v.get('content_type') == 'video/mp4']
+                                    if mp4s:
+                                        mp4s.sort(key=lambda x: x.get('bitrate', 0), reverse=True)
+                                        video_url = mp4s[0].get('url')
+                                        thumb_url = m.get('media_url_https')
+                                        break
+                except Exception:
+                    pass
+
+            if video_url:
+                proxied_url = f"/api/video/stream?url=" + urllib.parse.quote(video_url)
+                self.send_json({
+                    "status": "success",
+                    "video_url": video_url,
+                    "proxied_url": proxied_url,
+                    "thumbnail_url": thumb_url
+                })
+            else:
+                self.send_json({
+                    "status": "error",
+                    "message": "Video stream not found"
+                }, status=404)
+            return
 
             video_url = None
             thumb_url = None

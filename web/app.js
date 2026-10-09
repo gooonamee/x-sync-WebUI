@@ -1877,35 +1877,62 @@ function playInlineVideo(wrapper, tweet) {
   if (!wrapper) return;
   const tweetUrl = tweet.tweet_url || ('https://x.com/i/status/' + tweet.id);
 
-  // If already playing video, toggle play/pause
-  if (wrapper.classList.contains('playing') && wrapper.querySelector('video')) {
+  // If already playing, toggle play/pause
+  if (wrapper.classList.contains('playing')) {
     const v = wrapper.querySelector('video');
-    if (v.paused) v.play(); else v.pause();
+    if (v) {
+      if (v.paused) v.play(); else v.pause();
+      return;
+    }
+  }
+
+  // Check local mp4 first
+  const localPaths = tweet.local_media_paths || [];
+  const mediaUrls = tweet.media_urls || [];
+  let localVideo = localPaths.find(p => typeof p === 'string' && p.toLowerCase().includes('.mp4'));
+  if (localVideo) {
+    renderPurePlayer('/media/' + localVideo);
     return;
   }
 
-  // Check if local or direct mp4 is already known
-  const localPaths = tweet.local_media_paths || [];
-  const mediaUrls = tweet.media_urls || [];
-  let videoSrc = localPaths.find(p => typeof p === 'string' && p.toLowerCase().includes('.mp4'));
-  if (videoSrc) {
-    videoSrc = '/media/' + videoSrc;
-  } else {
-    videoSrc = mediaUrls.find(u => typeof u === 'string' && u.toLowerCase().includes('.mp4'));
-  }
-
+  let isCancelled = false;
   wrapper.classList.add('playing');
   wrapper.innerHTML = `
     <div class="pure-video-loading">
       <div class="video-loading-spinner"></div>
-      <span>載入純淨影片串流中...</span>
+      <span style="font-weight: 500;">正在解析並載入影片串流...</span>
+      <div style="display: flex; gap: 8px; margin-top: 6px;">
+        <button type="button" class="btn-cancel-play" style="background: rgba(255,255,255,0.15); color: #FFF; border: none; padding: 4px 12px; border-radius: 12px; font-size: 11px; cursor: pointer;">取消</button>
+        <a href="${tweetUrl}" target="_blank" rel="noopener noreferrer" style="background: #1D9BF0; color: #FFF; text-decoration: none; padding: 4px 12px; border-radius: 12px; font-size: 11px;">在 X 上觀看 ↗</a>
+      </div>
     </div>
   `;
 
-  const renderPurePlayer = (src) => {
+  wrapper.querySelector('.btn-cancel-play')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    isCancelled = true;
+    resetThumbnail();
+  });
+
+  function resetThumbnail() {
+    wrapper.classList.remove('playing');
+    const thumb = mediaUrls[0] || (localPaths[0] ? ('/media/' + localPaths[0]) : '');
+    wrapper.innerHTML = `
+      <img src="${thumb}" alt="video thumbnail" loading="lazy">
+      <div class="video-play-overlay">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+          <polygon points="6 4 20 12 6 20 6 4"></polygon>
+        </svg>
+      </div>
+      <span class="video-badge">${t('card_video_badge') || '▶ 影片'}</span>
+    `;
+  }
+
+  function renderPurePlayer(src) {
+    if (isCancelled) return;
     wrapper.innerHTML = `
       <div class="pure-video-container">
-        <video src="${src}" controls autoplay playsinline class="pure-video-player"></video>
+        <video src="${src}" controls autoplay playsinline class="pure-video-player" referrerpolicy="no-referrer"></video>
         <div class="pure-video-top-bar">
           <button type="button" class="btn-pure-fullscreen" title="全螢幕播放">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -1928,64 +1955,79 @@ function playInlineVideo(wrapper, tweet) {
     if (fsBtn && vEl) {
       fsBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (vEl.requestFullscreen) {
-          vEl.requestFullscreen();
-        } else if (vEl.webkitRequestFullscreen) {
-          vEl.webkitRequestFullscreen();
-        }
+        if (vEl.requestFullscreen) vEl.requestFullscreen();
+        else if (vEl.webkitRequestFullscreen) vEl.webkitRequestFullscreen();
       });
     }
-  };
 
-  const renderFallback = () => {
+    if (vEl) {
+      vEl.addEventListener('error', () => {
+        console.warn('Direct stream error, falling back to embedded player:', src);
+        renderIframeFallback();
+      });
+    }
+  }
+
+  function renderIframeFallback() {
+    if (isCancelled) return;
     wrapper.innerHTML = `
-      <div class="pure-video-fallback">
-        <p style="margin: 0; font-size: 13px; font-weight: 500;">此影片為 X 加密串流，可直接前往 X 觀看</p>
-        <a href="${tweetUrl}" target="_blank" rel="noopener noreferrer" class="btn-fallback-x">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-          </svg>
-          <span>在 X 上觀看影片 ↗</span>
-        </a>
+      <div class="pure-video-container" style="background: #000; min-height: 280px; position: relative;">
+        <iframe src="https://platform.twitter.com/embed/Tweet.html?id=${tweet.id}" style="width: 100%; height: 320px; border: none; overflow: hidden;" scrolling="no" allowfullscreen></iframe>
+        <div class="pure-video-top-bar" style="top: 8px; right: 8px;">
+          <a href="${tweetUrl}" target="_blank" rel="noopener noreferrer" class="btn-pure-watch-x">
+            <span>在 X 上觀看 ↗</span>
+          </a>
+        </div>
       </div>
     `;
-  };
-
-  if (videoSrc) {
-    renderPurePlayer(videoSrc);
-    return;
   }
 
   // Resolve video stream URL asynchronously
   (async () => {
-    let resolvedUrl = '';
+    let playUrl = '';
+    const authorHandle = (tweet.author_handle || '').replace('@', '');
+
     // 1. Try local server resolver
     try {
-      const res = await fetch(`${API_BASE}/video/resolve?id=${tweet.id}`);
+      const res = await fetch(`${API_BASE}/video/resolve?id=${tweet.id}&handle=${encodeURIComponent(authorHandle)}`);
       if (res.ok) {
         const data = await res.json();
-        if (data.video_url) resolvedUrl = data.video_url;
+        playUrl = data.proxied_url || data.video_url || '';
       }
     } catch (_) {}
 
-    // 2. Direct client-side resolver fallback
-    if (!resolvedUrl) {
+    // 2. Client-side fallback: FxTwitter v2
+    if (!playUrl) {
       try {
-        const resFx = await fetch(`https://api.fxtwitter.com/i/status/${tweet.id}`);
+        const resFx = await fetch(`https://api.fxtwitter.com/2/status/${tweet.id}`);
         if (resFx.ok) {
           const dataFx = await resFx.json();
           const vids = dataFx.tweet?.media?.videos || [];
           if (vids.length > 0 && vids[0].url) {
-            resolvedUrl = vids[0].url;
+            playUrl = `/api/video/stream?url=${encodeURIComponent(vids[0].url)}`;
           }
         }
       } catch (_) {}
     }
 
-    if (resolvedUrl) {
-      renderPurePlayer(resolvedUrl);
+    // 3. Client-side fallback: VxTwitter
+    if (!playUrl) {
+      try {
+        const resVx = await fetch(`https://api.vxtwitter.com/Twitter/status/${tweet.id}`);
+        if (resVx.ok) {
+          const dataVx = await resVx.json();
+          const vUrl = dataVx.video_url || (dataVx.mediaURLs && dataVx.mediaURLs[0]);
+          if (vUrl && (vUrl.includes('.mp4') || vUrl.includes('video'))) {
+            playUrl = `/api/video/stream?url=${encodeURIComponent(vUrl)}`;
+          }
+        }
+      } catch (_) {}
+    }
+
+    if (playUrl) {
+      renderPurePlayer(playUrl);
     } else {
-      renderFallback();
+      renderIframeFallback();
     }
   })();
 }
