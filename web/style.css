@@ -1589,3 +1589,151 @@ body {
   border-color: #1D9BF0;
   color: #1D9BF0;
 }
+
+
+/* Discord Channel Selection Modal Styling */
+.discord-tweet-preview {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #334155;
+  max-height: 80px;
+  overflow-y: auto;
+  line-height: 1.4;
+}
+
+.discord-channel-section {
+  margin-bottom: 12px;
+}
+
+.discord-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.discord-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0F1419;
+}
+
+.btn-text-action {
+  background: none;
+  border: none;
+  color: #1D9BF0;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 4px;
+  transition: color 0.15s ease;
+}
+.btn-text-action:hover {
+  text-decoration: underline;
+  color: #0c80d0;
+}
+
+.discord-channels-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.discord-channel-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  transition: all 0.15s ease;
+}
+
+.discord-channel-card:hover {
+  border-color: #5865F2;
+  background: #F8FAFF;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(88, 101, 242, 0.08);
+}
+
+.discord-channel-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  flex-grow: 1;
+}
+
+.discord-channel-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0F1419;
+}
+
+.discord-channel-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-send-discord-channel {
+  background: #5865F2;
+  color: #FFFFFF;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.btn-send-discord-channel:hover {
+  background: #4752C4;
+}
+
+.btn-send-discord-channel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-del-discord-channel {
+  background: transparent;
+  border: none;
+  color: #94A3B8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.btn-del-discord-channel:hover {
+  color: #EF4444;
+}
+
+.discord-add-form {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 10px;
+}
+
+.discord-empty-channels {
+  padding: 16px;
+  text-align: center;
+  color: #64748B;
+  font-size: 13px;
+  background: #F8FAFC;
+  border-radius: 8px;
+  border: 1px dashed #CBD5E1;
+}
