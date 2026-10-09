@@ -264,6 +264,7 @@ function setupEventListeners() {
     if (e.key === 'Escape') {
       closeContextMenuTagPopup();
       closeSharePopup();
+      closeDiscordModal();
     }
   });
 
@@ -280,6 +281,7 @@ function setupEventListeners() {
     if (sharePopup && sharePopup.style.display !== 'none') {
       if (!sharePopup.contains(e.target) && !e.target.closest('.btn-card-share') && !e.target.closest('#btn-context-share')) {
         closeSharePopup();
+      closeDiscordModal();
       }
     }
   });
@@ -308,6 +310,7 @@ function setupEventListeners() {
     window.open(waUrl, '_blank');
 
     closeSharePopup();
+      closeDiscordModal();
   });
 
   document.getElementById('share-to-x')?.addEventListener('click', () => {
@@ -317,6 +320,7 @@ function setupEventListeners() {
     const shareUrl = 'https://x.com/intent/post?url=' + encodeURIComponent(tweetUrl) + '&text=' + encodeURIComponent(text ? text + '... ' : '');
     window.open(shareUrl, '_blank', 'width=600,height=550,location=no,toolbar=no');
     closeSharePopup();
+      closeDiscordModal();
   });
 
   document.getElementById('share-to-threads')?.addEventListener('click', () => {
@@ -326,6 +330,7 @@ function setupEventListeners() {
     const payload = text ? (text + '\n' + tweetUrl) : tweetUrl;
     window.open('https://www.threads.net/intent/post?text=' + encodeURIComponent(payload), '_blank', 'width=600,height=550');
     closeSharePopup();
+      closeDiscordModal();
   });
 
   document.getElementById('share-to-line')?.addEventListener('click', () => {
@@ -333,6 +338,7 @@ function setupEventListeners() {
     const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
     window.open('https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(tweetUrl), '_blank', 'width=600,height=550');
     closeSharePopup();
+      closeDiscordModal();
   });
 
   document.getElementById('share-to-telegram')?.addEventListener('click', () => {
@@ -341,6 +347,7 @@ function setupEventListeners() {
     const text = (currentShareTweet.content || '').slice(0, 120);
     window.open('https://t.me/share/url?url=' + encodeURIComponent(tweetUrl) + '&text=' + encodeURIComponent(text), '_blank', 'width=600,height=550');
     closeSharePopup();
+      closeDiscordModal();
   });
 
   document.getElementById('share-to-facebook')?.addEventListener('click', () => {
@@ -348,6 +355,7 @@ function setupEventListeners() {
     const tweetUrl = currentShareTweet.tweet_url || ('https://x.com/i/status/' + currentShareTweet.id);
     window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(tweetUrl), '_blank', 'width=600,height=550');
     closeSharePopup();
+      closeDiscordModal();
   });
 
   document.getElementById('share-to-native')?.addEventListener('click', async () => {
@@ -366,6 +374,7 @@ function setupEventListeners() {
       showToast(t('share_link_copied'));
     }
     closeSharePopup();
+      closeDiscordModal();
   });
 
   document.getElementById('share-copy-link')?.addEventListener('click', async () => {
@@ -374,6 +383,7 @@ function setupEventListeners() {
     await copyTextToClipboard(tweetUrl);
     showToast(t('share_link_copied'));
     closeSharePopup();
+      closeDiscordModal();
   });
 
   document.getElementById('share-copy-quote')?.addEventListener('click', async () => {
@@ -383,6 +393,7 @@ function setupEventListeners() {
     await copyTextToClipboard(quoteText);
     showToast(t('share_quote_copied'));
     closeSharePopup();
+      closeDiscordModal();
   });
 
   document.getElementById('btn-context-share')?.addEventListener('click', (e) => {
@@ -1165,6 +1176,195 @@ function saveDiscordChannels(channels) {
 function openDiscordModal(tweet) {
   currentDiscordTweet = tweet;
   closeSharePopup();
+      closeDiscordModal();
+  const modal = document.getElementById('discord-share-modal');
+  if (!modal) {
+    console.error('discord-share-modal not found');
+    return;
+  }
+
+  const preview = document.getElementById('discord-tweet-preview');
+  if (preview) {
+    const author = tweet.author_name ? `${escapeHtml(tweet.author_name)} (@${escapeHtml(tweet.author_handle)})` : `@${escapeHtml(tweet.author_handle)}`;
+    const content = escapeHtml((tweet.content || '').slice(0, 140));
+    preview.innerHTML = `<strong>${author}</strong>: ${content}${tweet.content && tweet.content.length > 140 ? '...' : ''}`;
+  }
+
+  const addForm = document.getElementById('discord-add-form');
+  if (addForm) {
+    addForm.style.display = 'none';
+  }
+  renderDiscordChannels();
+  modal.style.display = 'flex';
+}
+
+function closeDiscordModal() {
+  const modal = document.getElementById('discord-share-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+  currentDiscordTweet = null;
+}
+
+function renderDiscordChannels() {
+  const list = document.getElementById('discord-channels-list');
+  const addForm = document.getElementById('discord-add-form');
+  if (!list) return;
+
+  const channels = getDiscordChannels();
+  list.innerHTML = '';
+
+  if (channels.length === 0) {
+    list.innerHTML = `<div class="discord-empty-channels">${t('discord_empty_channels')}</div>`;
+    if (addForm) {
+      addForm.style.display = 'block';
+    }
+    return;
+  }
+
+  channels.forEach((ch, idx) => {
+    const card = document.createElement('div');
+    card.className = 'discord-channel-card';
+    card.innerHTML = `
+      <div class="discord-channel-info" title="點擊發送至此頻道">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="#5865F2">
+          <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+        </svg>
+        <span class="discord-channel-name">${escapeHtml(ch.name)}</span>
+      </div>
+      <div class="discord-channel-actions">
+        <button type="button" class="btn-send-discord-channel" data-idx="${idx}">發送</button>
+        <button type="button" class="btn-del-discord-channel" data-idx="${idx}" title="刪除此頻道">&times;</button>
+      </div>
+    `;
+
+    card.querySelector('.discord-channel-info').addEventListener('click', () => {
+      sendToDiscordWebhook(ch, currentDiscordTweet, card.querySelector('.btn-send-discord-channel'));
+    });
+    card.querySelector('.btn-send-discord-channel').addEventListener('click', (e) => {
+      e.stopPropagation();
+      sendToDiscordWebhook(ch, currentDiscordTweet, e.currentTarget);
+    });
+    card.querySelector('.btn-del-discord-channel').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (confirm(t('discord_confirm_delete'))) {
+        channels.splice(idx, 1);
+        saveDiscordChannels(channels);
+        renderDiscordChannels();
+      }
+    });
+    list.appendChild(card);
+  });
+}
+
+async function sendToDiscordWebhook(channel, tweet, btnEl) {
+  if (!tweet || !channel || !channel.url) return;
+  if (btnEl) {
+    btnEl.disabled = true;
+    btnEl.textContent = t('discord_sending') || '發送中...';
+  }
+
+  const authorText = tweet.author_name ? `${tweet.author_name} (@${tweet.author_handle})` : `@${tweet.author_handle}`;
+  const mediaUrls = tweet.media_urls || [];
+  const tweetUrl = tweet.tweet_url || `https://x.com/i/status/${tweet.id}`;
+
+  const embed = {
+    author: {
+      name: authorText,
+      icon_url: tweet.author_avatar || undefined,
+      url: tweetUrl
+    },
+    description: tweet.content || '(無文字內容)',
+    url: tweetUrl,
+    color: 0x1D9BF0,
+    footer: {
+      text: "X-Sync 典藏",
+      icon_url: "https://abs.twimg.com/favicons/twitter.3.ico"
+    },
+    timestamp: tweet.created_at ? new Date(tweet.created_at).toISOString() : new Date().toISOString()
+  };
+  if (mediaUrls.length > 0) {
+    embed.image = { url: mediaUrls[0] };
+  }
+
+  const payload = {
+    content: `📢 來自 **${authorText}** 的推文分享：\n${tweetUrl}`,
+    embeds: [embed]
+  };
+
+  try {
+    let sent = false;
+    // 1. Try local server proxy (CORS safe)
+    try {
+      const res = await fetch(`${API_BASE}/discord/webhook`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ webhook_url: channel.url, payload: payload })
+      });
+      if (res.ok) sent = true;
+    } catch (_) {}
+
+    // 2. Direct fallback
+    if (!sent) {
+      const resDirect = await fetch(channel.url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (resDirect.ok) sent = true;
+    }
+
+    if (sent) {
+      showToast(`🎉 ${t('discord_sent_success')} (${channel.name})`);
+      closeDiscordModal();
+    } else {
+      throw new Error('發送至 Webhook 失敗，請確認 Webhook 網址是否有效。');
+    }
+  } catch (err) {
+    alert(t('discord_sent_fail') + err.message);
+  } finally {
+    if (btnEl) {
+      btnEl.disabled = false;
+      btnEl.textContent = '發送';
+    }
+  }
+}
+
+async function copyTextToClipboard(text) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+  } catch (_) {}
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+}
+
+
+// Discord Webhook Channels Management
+function getDiscordChannels() {
+  try {
+    return JSON.parse(localStorage.getItem('x_sync_discord_channels') || '[]');
+  } catch (_) {
+    return [];
+  }
+}
+
+function saveDiscordChannels(channels) {
+  localStorage.setItem('x_sync_discord_channels', JSON.stringify(channels));
+}
+
+function openDiscordModal(tweet) {
+  currentDiscordTweet = tweet;
+  closeSharePopup();
+      closeDiscordModal();
   if (!discordShareModal) return;
 
   if (discordTweetPreview) {
@@ -1310,6 +1510,7 @@ async function sendToDiscordWebhook(channel, tweet, btnEl) {
 
 function openSharePopup(tweet, triggerBtn) {
   closeSharePopup();
+      closeDiscordModal();
   if (typeof closeContextMenuTagPopup === 'function') {
     closeContextMenuTagPopup();
   }
