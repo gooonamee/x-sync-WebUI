@@ -979,7 +979,8 @@ const I18N_LOCALES = {
     history_th_updated: '更新数',
     history_th_time: '时间',
     history_th_details: '详情'
-  }
+  },
+
   'ja': {
   "name": "日本語",
   "app_name": "X sync",
