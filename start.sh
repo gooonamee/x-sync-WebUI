@@ -3,12 +3,15 @@
 # X sync - Local Management Server Launcher (macOS/Linux)
 # ==================================================
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SERVER_DIR="$SCRIPT_DIR/server"
+# 取得專案根目錄（以目前腳本所在目錄動態定位）
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SERVER_DIR="$PROJECT_ROOT/server"
 
 echo "=================================================="
 echo "  啟動 X sync 本機伺服器與資料庫..."
-echo "  目錄: $SERVER_DIR"
+echo "  專案目錄: $PROJECT_ROOT"
+echo "  服務目錄: $SERVER_DIR"
+echo "  資料庫:   $SERVER_DIR/data/x_sync.db"
 echo "=================================================="
 
 # 確保資料與媒體儲存目錄存在
@@ -22,4 +25,4 @@ elif command -v xdg-open >/dev/null 2>&1; then
 fi
 
 # 啟動 Python 後端伺服器 (使用 Python 3 標準庫，零額外依賴)
-python3 "$SERVER_DIR/server.py"
+cd "$SERVER_DIR" && python3 "server.py"

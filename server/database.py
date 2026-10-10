@@ -3,7 +3,10 @@ import json
 import os
 from datetime import datetime
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'data', 'x_sync.db')
+# 動態定位：以 server 目錄為基準，確保資料庫一律指向 [專案目錄]/server/data/x_sync.db
+SERVER_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(SERVER_DIR, '..'))
+DB_PATH = os.path.join(SERVER_DIR, 'data', 'x_sync.db')
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)

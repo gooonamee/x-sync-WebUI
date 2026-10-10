@@ -13,8 +13,10 @@ from database import get_db, init_db, seed_sample_data, DB_PATH
 from markdown_exporter import export_combined_markdown, export_zip_markdown
 
 PORT = int(os.environ.get("PORT", 8765))
-WEB_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'web'))
-MEDIA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data', 'media'))
+SERVER_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(SERVER_DIR, '..'))
+WEB_DIR = os.path.abspath(os.path.join(PROJECT_ROOT, 'web'))
+MEDIA_DIR = os.path.abspath(os.path.join(SERVER_DIR, 'data', 'media'))
 
 os.makedirs(MEDIA_DIR, exist_ok=True)
 
@@ -718,14 +720,36 @@ def run_server():
     init_db()
     if os.environ.get("SEED_SAMPLE_DATA", "0") == "1":
         seed_sample_data()
+    # 啟動時檢查資料庫統計數據
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM tweets")
+        total_tweets = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM tweets WHERE source_type LIKE '%bookmark%'")
+        bm_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM tweets WHERE source_type LIKE '%like%'")
+        lk_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM tags")
+        tag_count = cursor.fetchone()[0]
+        cursor.execute("SELECT DISTINCT source_type FROM tweets")
+        source_types = [r[0] for r in cursor.fetchall()]
+        conn.close()
+    except Exception as e:
+        total_tweets, bm_count, lk_count, tag_count, source_types = f"錯誤: {e}", 0, 0, 0, []
+
     socketserver.TCPServer.allow_reuse_address = True
-    host = "127.0.0.1"
+    host = ""
     with socketserver.TCPServer((host, PORT), XSyncHandler) as httpd:
         print(f"==================================================")
         print(f"  X sync Local Server is running!")
+        print(f"  專案目錄:      {PROJECT_ROOT}")
+        print(f"  服務目錄:      {SERVER_DIR}")
         print(f"  Web Dashboard: http://localhost:{PORT}/")
         print(f"  API Endpoint:  http://localhost:{PORT}/api/")
         print(f"  Database:      {DB_PATH}")
+        print(f"  資料庫統計:    推文總數 {total_tweets} 篇 (書籤: {bm_count}, 點讚: {lk_count}, 標籤: {tag_count})")
+        print(f"  來源類型:      {source_types}")
         print(f"==================================================")
         try:
             httpd.serve_forever()
